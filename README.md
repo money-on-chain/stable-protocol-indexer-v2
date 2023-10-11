@@ -1,11 +1,11 @@
 # Stable Protocol Indexer v2
 
+## Warning: This is only for version 2 of the main contracts. 
+
 ## Introduction
 
 To speed up the dapp we need an indexer of the blockchain of our contracts. 
-This service is required to display operations in the dapp.  
-The indexer query the status of the contracts
-and write to mongo database, so the app query the mongo instead of blockchain (slow).
+This service is required to display operations in the dapp.  The indexer query the status of the contracts and write to mongo database, so the app query the mongo instead of blockchain (slow).
 
 ### Jobs
 
