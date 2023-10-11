@@ -60,18 +60,21 @@ class ScanLogsTransactions:
         contracts_log_decoder[self.contracts_addresses['TP_0'].lower()] = LogDecoder(
             self.contracts_loaded['TP_0'].sc
         )
-        contracts_log_decoder[self.contracts_addresses['TP_1'].lower()] = LogDecoder(
-            self.contracts_loaded['TP_1'].sc
-        )
+        if 'TP_1' in self.options['addresses']:
+            contracts_log_decoder[self.contracts_addresses['TP_1'].lower()] = LogDecoder(
+                self.contracts_loaded['TP_1'].sc
+            )
         contracts_log_decoder[self.contracts_addresses['CA_0'].lower()] = LogDecoder(
             self.contracts_loaded['CA_0'].sc
         )
-        contracts_log_decoder[self.contracts_addresses['CA_1'].lower()] = LogDecoder(
-            self.contracts_loaded['CA_1'].sc
-        )
-        contracts_log_decoder[self.contracts_addresses['TG'].lower()] = LogDecoder(
-            self.contracts_loaded['TG'].sc
-        )
+        if 'CA_1' in self.options['addresses']:
+            contracts_log_decoder[self.contracts_addresses['CA_1'].lower()] = LogDecoder(
+                self.contracts_loaded['CA_1'].sc
+            )
+        if 'TG' in self.options['addresses']:
+            contracts_log_decoder[self.contracts_addresses['TG'].lower()] = LogDecoder(
+                self.contracts_loaded['TG'].sc
+            )
         contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
             self.contracts_loaded['FastBtcBridge'].sc
         )
@@ -161,14 +164,15 @@ class ScanLogsTransactions:
                 'TP_0')
         }
 
-        d_event[self.contracts_addresses["TP_1"].lower()] = {
-            "Transfer": EventTokenTransfer(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info,
-                'TP_1')
-        }
+        if 'TP_1' in self.options['addresses']:
+            d_event[self.contracts_addresses["TP_1"].lower()] = {
+                "Transfer": EventTokenTransfer(
+                    self.options,
+                    self.connection_helper,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    'TP_1')
+            }
 
         d_event[self.contracts_addresses["CA_0"].lower()] = {
             "Transfer": EventTokenTransfer(
@@ -179,23 +183,25 @@ class ScanLogsTransactions:
                 'CA_0')
         }
 
-        d_event[self.contracts_addresses["CA_1"].lower()] = {
-            "Transfer": EventTokenTransfer(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info,
-                'CA_1')
-        }
+        if 'CA_1' in self.options['addresses']:
+            d_event[self.contracts_addresses["CA_1"].lower()] = {
+                "Transfer": EventTokenTransfer(
+                    self.options,
+                    self.connection_helper,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    'CA_1')
+            }
 
-        d_event[self.contracts_addresses["TG"].lower()] = {
-            "Transfer": EventTokenTransfer(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info,
-                'TG')
-        }
+        if 'TG' in self.options['addresses']:
+            d_event[self.contracts_addresses["TG"].lower()] = {
+                "Transfer": EventTokenTransfer(
+                    self.options,
+                    self.connection_helper,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    'TG')
+            }
 
         d_event[self.options['addresses']['FastBtcBridge'].lower()] = {
             "NewBitcoinTransfer": EventFastBtcBridgeNewBitcoinTransfer(

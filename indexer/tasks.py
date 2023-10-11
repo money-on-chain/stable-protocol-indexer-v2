@@ -67,10 +67,11 @@ class StableIndexerTasks(TasksManager):
         self.contracts_addresses['TP_0'] = self.contracts_loaded["TP_0"].address().lower()
 
         # Token TP_1
-        self.contracts_loaded["TP_1"] = ERC20Token(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['TP_1'])
-        self.contracts_addresses['TP_1'] = self.contracts_loaded["TP_1"].address().lower()
+        if 'TP_1' in self.config['addresses']:
+            self.contracts_loaded["TP_1"] = ERC20Token(
+                self.connection_helper.connection_manager,
+                contract_address=self.config['addresses']['TP_1'])
+            self.contracts_addresses['TP_1'] = self.contracts_loaded["TP_1"].address().lower()
 
         # Token CA_0
         self.contracts_loaded["CA_0"] = ERC20Token(
@@ -79,10 +80,18 @@ class StableIndexerTasks(TasksManager):
         self.contracts_addresses['CA_0'] = self.contracts_loaded["CA_0"].address().lower()
 
         # Token CA_1
-        self.contracts_loaded["CA_1"] = ERC20Token(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['CA_1'])
-        self.contracts_addresses['CA_1'] = self.contracts_loaded["CA_1"].address().lower()
+        if 'CA_1' in self.config['addresses']:
+            self.contracts_loaded["CA_1"] = ERC20Token(
+                self.connection_helper.connection_manager,
+                contract_address=self.config['addresses']['CA_1'])
+            self.contracts_addresses['CA_1'] = self.contracts_loaded["CA_1"].address().lower()
+
+        # Token TG
+        if 'TG' in self.config['addresses']:
+            self.contracts_loaded["TG"] = ERC20Token(
+                self.connection_helper.connection_manager,
+                contract_address=self.config['addresses']['TG'])
+            self.contracts_addresses['TG'] = self.contracts_loaded["TG"].address().lower()
 
         self.filter_contracts_addresses = [v.lower() for k, v in self.contracts_addresses.items()]
 

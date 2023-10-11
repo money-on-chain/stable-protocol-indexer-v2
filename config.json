@@ -1,9 +1,8 @@
 {
-  "app_mode": "RRC20",
   "uri": "https://public-node.testnet.rsk.co",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "moc_testnet"
+    "db": "flipago"
   },
   "debug": true,
   "tasks": {
@@ -35,8 +34,14 @@
     "confirm_blocks": 10
   },
   "addresses": {
-    "MoC": "0x4512f4C1d984bbf8B7f7404EddFb1881cFA79EfD",
     "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "FastBtcBridge": "0xb3E92Db36eeac0627385Fa4F39F615a85eA5E911"
+    "MocCABag": "0x2781df266eE4A5A678074227027d945a6c53BdB6",
+    "MocCAWrapper": "0x01efe9D03982cEBFaB1ca85E6c8f78380cfDc41f",
+    "TC": "0x1f5106C6Fcf9Cc83204B3fd330B340f2718DA11D",
+    "TP_0": "0x1C25c283e47F2d9d3238a72991B7b7da014aC73e",
+    "TP_1": "0x8Cd0aBB6C73A3374FCEacDB5C1Fa125bb5E08c32",
+    "CA_0": "0xCB46c0ddc60D18eFEB0E586C17Af6ea36452Dae0",
+    "CA_1": "0xC3De9F38581f83e281f260d0DdbaAc0e102ff9F8",
+    "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A"
   }
 }
