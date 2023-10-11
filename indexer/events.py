@@ -96,10 +96,13 @@ class EventMocCABagTCMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] TC: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: {6}".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTC_"],
+            d_tx["qAC_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -148,10 +151,13 @@ class EventMocCABagTCRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTC_"],
+            d_tx["qAC_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -201,10 +207,13 @@ class EventMocCABagTPMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTP_"],
+            d_tx["qAC_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -254,10 +263,13 @@ class EventMocCABagTPRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTP_"],
+            d_tx["qAC_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -308,10 +320,13 @@ class EventMocCABagTPSwappedForTP(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTPfrom_: [{3}] qTPto_: [{4}] qACfee_: [{5}] Tx Hash: [{6}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTPfrom_"],
+            d_tx["qTPto_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -361,10 +376,13 @@ class EventMocCABagTPSwappedForTC(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qTC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTP_"],
+            d_tx["qTC_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -414,10 +432,13 @@ class EventMocCABagTCSwappedForTP(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{3}] qTP: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTC_"],
+            d_tx["qTP_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -467,10 +488,14 @@ class EventMocCABagTCandTPRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qTP: [{4}] qAC: [{5}] qACfee: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTC_"],
+            d_tx["qTP_"],
+            d_tx["qAC_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -520,10 +545,14 @@ class EventMocCABagTCandTPMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTC_"],
+            d_tx["qTP_"],
+            d_tx["qAC_"],
+            d_tx["qACfee_"],
             tx_hash))
 
         return parsed
@@ -597,10 +626,12 @@ class EventTokenTransfer(BaseEvent):
             {"$set": d_tx},
             upsert=True)
 
-        log.info("Tx {0} From: [{1}] Amount: {2} Tx Hash: {3}".format(
+        log.info("Tx {0} - Token: [{1}] From: [{2}] To: [{3}] Value: [{4}] Tx Hash: [{5}]".format(
             d_tx["event"],
-            d_tx["address"],
-            d_tx["amount"],
+            d_tx["token"],
+            d_tx["from_"],
+            d_tx["to_"],
+            d_tx["value_"],
             tx_hash))
 
         return parsed
