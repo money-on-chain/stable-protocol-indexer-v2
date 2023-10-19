@@ -14,7 +14,12 @@ from .events import EventMocCABagTCMinted, \
     EventMocCABagTCandTPMinted, \
     EventTokenTransfer, \
     EventFastBtcBridgeNewBitcoinTransfer, \
-    EventFastBtcBridgeBitcoinTransferStatusUpdated
+    EventFastBtcBridgeBitcoinTransferStatusUpdated, \
+    EventMocCABagTCMintedWithWrapper, \
+    EventMocCABagTCRedeemedWithWrapper, \
+    EventMocCABagTPMintedWithWrapper, \
+    EventMocCABagTPRedeemedWithWrapper
+
 
 from .base.decoder import LogDecoder, UnknownEvent
 
@@ -53,6 +58,9 @@ class ScanLogsTransactions:
         contracts_log_decoder = dict()
         contracts_log_decoder[self.contracts_addresses['MocCABag'].lower()] = LogDecoder(
             self.contracts_loaded['MocCABag'].sc
+        )
+        contracts_log_decoder[self.contracts_addresses['MocCAWrapper'].lower()] = LogDecoder(
+            self.contracts_loaded['MocCAWrapper'].sc
         )
         contracts_log_decoder[self.contracts_addresses['TC'].lower()] = LogDecoder(
             self.contracts_loaded['TC'].sc
@@ -144,6 +152,29 @@ class ScanLogsTransactions:
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
+        }
+
+        d_event[self.contracts_addresses["MocCAWrapper"].lower()] = {
+            "TCMintedWithWrapper": EventMocCABagTCMintedWithWrapper(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCRedeemedWithWrapper": EventMocCABagTCRedeemedWithWrapper(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPMintedWithWrapper": EventMocCABagTPMintedWithWrapper(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPRedeemedWithWrapper": EventMocCABagTPRedeemedWithWrapper(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info)
         }
 
         d_event[self.contracts_addresses["TC"].lower()] = {

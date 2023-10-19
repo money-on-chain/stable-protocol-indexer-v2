@@ -69,7 +69,7 @@ class EventMocCABagTCMinted(BaseEvent):
 
         d_tx = OrderedDict()
         d_tx["blockNumber"] = parsed_receipt["blockNumber"]
-        d_tx["event"] = parsed_receipt['eventName']
+        d_tx["event"] = 'TCMinted'
         d_tx["transactionHash"] = tx_hash
         d_tx["processLogs"] = True
         d_tx["createdAt"] = parsed_receipt['createdAt']
@@ -82,6 +82,12 @@ class EventMocCABagTCMinted(BaseEvent):
         gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
 
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -108,6 +114,61 @@ class EventMocCABagTCMinted(BaseEvent):
         return parsed
 
 
+class EventMocCABagTCMintedWithWrapper(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # status of tx
+        status, confirmation_time, confirming_percent = self.confirming_percent(parsed)
+
+        # get collection transaction
+        collection_tx = self.connection_helper.mongo_collection('Transaction')
+
+        tx_hash = parsed['hash']
+
+        d_tx = OrderedDict()
+        d_tx["blockNumber"] = parsed_receipt["blockNumber"]
+        d_tx["event"] = 'TCMinted'
+        d_tx["transactionHash"] = tx_hash
+        d_tx["processLogs"] = True
+        d_tx["processWrapper"] = True
+        d_tx["createdAt"] = parsed_receipt['createdAt']
+        d_tx["gas"] = parsed['gas']
+        d_tx["gasPrice"] = str(parsed['gasPrice'])
+        d_tx["gasUsed"] = parsed['gasUsed']
+        d_tx["confirmationTime"] = confirmation_time
+        d_tx['confirmingPercent'] = confirming_percent
+        d_tx["lastUpdatedAt"] = datetime.datetime.now()
+        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
+        d_tx["status"] = status
+
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        d_tx["address"] = recipient
+
+        d_tx["sender_"] = sanitize_address(parsed["sender_"])
+        d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
+        d_tx["qAsset_"] = str(parsed["qAsset_"])
+
+        post_id = collection_tx.find_one_and_update(
+            {"transactionHash": tx_hash,
+             "event": d_tx["event"]},
+            {"$set": d_tx},
+            upsert=True)
+        d_tx['post_id'] = post_id
+
+        log.info("Tx {0} Wrapper - Sender: [{1}] Recipient: [{2}] qAsset: [{3}] Tx Hash: {4}".format(
+            d_tx["event"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qAsset_"],
+            tx_hash))
+
+        return parsed
+
+
 class EventMocCABagTCRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
@@ -124,7 +185,7 @@ class EventMocCABagTCRedeemed(BaseEvent):
 
         d_tx = OrderedDict()
         d_tx["blockNumber"] = parsed_receipt["blockNumber"]
-        d_tx["event"] = parsed_receipt['eventName']
+        d_tx["event"] = 'TCRedeemed'
         d_tx["transactionHash"] = tx_hash
         d_tx["processLogs"] = True
         d_tx["createdAt"] = parsed_receipt['createdAt']
@@ -137,6 +198,12 @@ class EventMocCABagTCRedeemed(BaseEvent):
         gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
 
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -163,6 +230,62 @@ class EventMocCABagTCRedeemed(BaseEvent):
         return parsed
 
 
+class EventMocCABagTCRedeemedWithWrapper(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # status of tx
+        status, confirmation_time, confirming_percent = self.confirming_percent(parsed)
+
+        # get collection transaction
+        collection_tx = self.connection_helper.mongo_collection('Transaction')
+
+        tx_hash = parsed['hash']
+
+        d_tx = OrderedDict()
+        d_tx["blockNumber"] = parsed_receipt["blockNumber"]
+        d_tx["event"] = 'TCRedeemed'
+        d_tx["transactionHash"] = tx_hash
+        d_tx["processLogs"] = True
+        d_tx["processWrapper"] = True
+        d_tx["createdAt"] = parsed_receipt['createdAt']
+        d_tx["gas"] = parsed['gas']
+        d_tx["gasPrice"] = str(parsed['gasPrice'])
+        d_tx["gasUsed"] = parsed['gasUsed']
+        d_tx["confirmationTime"] = confirmation_time
+        d_tx['confirmingPercent'] = confirming_percent
+        d_tx["lastUpdatedAt"] = datetime.datetime.now()
+        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
+        d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        d_tx["address"] = recipient
+
+        d_tx["sender_"] = sanitize_address(parsed["sender_"])
+        d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
+        d_tx["qAsset_"] = str(parsed["qAsset_"])
+
+        post_id = collection_tx.find_one_and_update(
+            {"transactionHash": tx_hash,
+             "event": d_tx["event"]},
+            {"$set": d_tx},
+            upsert=True)
+        d_tx['post_id'] = post_id
+
+        log.info("Tx {0} Wrapper - Sender: [{1}] Recipient: [{2}]  qAsset: [{3}] Tx Hash: [{4}]".format(
+            d_tx["event"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qAsset_"],
+            tx_hash))
+
+        return parsed
+
+
 class EventMocCABagTPMinted(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
@@ -179,7 +302,7 @@ class EventMocCABagTPMinted(BaseEvent):
 
         d_tx = OrderedDict()
         d_tx["blockNumber"] = parsed_receipt["blockNumber"]
-        d_tx["event"] = parsed_receipt['eventName']
+        d_tx["event"] = 'TPMinted'
         d_tx["transactionHash"] = tx_hash
         d_tx["processLogs"] = True
         d_tx["createdAt"] = parsed_receipt['createdAt']
@@ -192,6 +315,12 @@ class EventMocCABagTPMinted(BaseEvent):
         gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -219,6 +348,63 @@ class EventMocCABagTPMinted(BaseEvent):
         return parsed
 
 
+class EventMocCABagTPMintedWithWrapper(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # status of tx
+        status, confirmation_time, confirming_percent = self.confirming_percent(parsed)
+
+        # get collection transaction
+        collection_tx = self.connection_helper.mongo_collection('Transaction')
+
+        tx_hash = parsed['hash']
+
+        d_tx = OrderedDict()
+        d_tx["blockNumber"] = parsed_receipt["blockNumber"]
+        d_tx["event"] = 'TPMinted'
+        d_tx["transactionHash"] = tx_hash
+        d_tx["processLogs"] = True
+        d_tx["processWrapper"] = True
+        d_tx["createdAt"] = parsed_receipt['createdAt']
+        d_tx["gas"] = parsed['gas']
+        d_tx["gasPrice"] = str(parsed['gasPrice'])
+        d_tx["gasUsed"] = parsed['gasUsed']
+        d_tx["confirmationTime"] = confirmation_time
+        d_tx['confirmingPercent'] = confirming_percent
+        d_tx["lastUpdatedAt"] = datetime.datetime.now()
+        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
+        d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        d_tx["address"] = recipient
+
+        d_tx["i_"] = sanitize_address(parsed["i_"])
+        d_tx["sender_"] = sanitize_address(parsed["sender_"])
+        d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
+        d_tx["asset_"] = sanitize_address(parsed["asset_"])
+        d_tx["qAsset_"] = str(parsed["qAsset_"])
+
+        post_id = collection_tx.find_one_and_update(
+            {"transactionHash": tx_hash,
+             "event": d_tx["event"]},
+            {"$set": d_tx},
+            upsert=True)
+        d_tx['post_id'] = post_id
+
+        log.info("Tx {0} Wrapper - Sender: [{1}] Recipient: [{2}] qAsset_: [{3}] Tx Hash: [{4}]".format(
+            d_tx["event"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qAsset_"],
+            tx_hash))
+
+        return parsed
+
+
 class EventMocCABagTPRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
@@ -235,7 +421,7 @@ class EventMocCABagTPRedeemed(BaseEvent):
 
         d_tx = OrderedDict()
         d_tx["blockNumber"] = parsed_receipt["blockNumber"]
-        d_tx["event"] = parsed_receipt['eventName']
+        d_tx["event"] = 'TPRedeemed'
         d_tx["transactionHash"] = tx_hash
         d_tx["processLogs"] = True
         d_tx["createdAt"] = parsed_receipt['createdAt']
@@ -248,6 +434,12 @@ class EventMocCABagTPRedeemed(BaseEvent):
         gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -270,6 +462,63 @@ class EventMocCABagTPRedeemed(BaseEvent):
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            tx_hash))
+
+        return parsed
+
+
+class EventMocCABagTPRedeemedWithWrapper(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # status of tx
+        status, confirmation_time, confirming_percent = self.confirming_percent(parsed)
+
+        # get collection transaction
+        collection_tx = self.connection_helper.mongo_collection('Transaction')
+
+        tx_hash = parsed['hash']
+
+        d_tx = OrderedDict()
+        d_tx["blockNumber"] = parsed_receipt["blockNumber"]
+        d_tx["event"] = 'TPRedeemed'
+        d_tx["transactionHash"] = tx_hash
+        d_tx["processLogs"] = True
+        d_tx["processWrapper"] = True
+        d_tx["createdAt"] = parsed_receipt['createdAt']
+        d_tx["gas"] = parsed['gas']
+        d_tx["gasPrice"] = str(parsed['gasPrice'])
+        d_tx["gasUsed"] = parsed['gasUsed']
+        d_tx["confirmationTime"] = confirmation_time
+        d_tx['confirmingPercent'] = confirming_percent
+        d_tx["lastUpdatedAt"] = datetime.datetime.now()
+        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
+        d_tx["status"] = status
+
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        d_tx["address"] = recipient
+
+        d_tx["i_"] = sanitize_address(parsed["i_"])
+        d_tx["sender_"] = sanitize_address(parsed["sender_"])
+        d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
+        d_tx["asset_"] = sanitize_address(parsed["asset_"])
+        d_tx["qAsset_"] = str(parsed["qAsset_"])
+
+        post_id = collection_tx.find_one_and_update(
+            {"transactionHash": tx_hash,
+             "event": d_tx["event"]},
+            {"$set": d_tx},
+            upsert=True)
+        d_tx['post_id'] = post_id
+
+        log.info("Tx {0} Wrapper - Sender: [{1}] Recipient: [{2}]  qAsset_: [{3}] Tx Hash: [{4}]".format(
+            d_tx["event"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qAsset_"],
             tx_hash))
 
         return parsed
@@ -304,6 +553,12 @@ class EventMocCABagTPSwappedForTP(BaseEvent):
         gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
 
         d_tx["iFrom_"] = sanitize_address(parsed["iFrom_"])
         d_tx["iTo_"] = sanitize_address(parsed["iTo_"])
@@ -362,6 +617,12 @@ class EventMocCABagTPSwappedForTC(BaseEvent):
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
 
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
+
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -418,6 +679,12 @@ class EventMocCABagTCSwappedForTP(BaseEvent):
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
 
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
+
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -472,6 +739,12 @@ class EventMocCABagTCandTPRedeemed(BaseEvent):
         gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -529,6 +802,12 @@ class EventMocCABagTCandTPMinted(BaseEvent):
         gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
         d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
+        if recipient != ca_wrapper:
+            d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -616,8 +895,8 @@ class EventTokenTransfer(BaseEvent):
         d_tx["status"] = status
 
         d_tx["token"] = self.token_involved
-        d_tx["from_"] = sanitize_address(parsed["from"])
-        d_tx["to_"] = sanitize_address(parsed["to"])
+        d_tx["from_"] = sanitize_address(parsed["from"]).lower()
+        d_tx["to_"] = sanitize_address(parsed["to"]).lower()
         d_tx["value_"] = str(parsed["value"])
 
         post_id = collection_tx.find_one_and_update(
