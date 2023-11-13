@@ -85,9 +85,10 @@ class EventMocTCMinted(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -105,13 +106,14 @@ class EventMocTCMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] TC: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: {6}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] TC: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: {7}".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTC_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -204,9 +206,10 @@ class EventMocTCRedeemed(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -224,13 +227,14 @@ class EventMocTCRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTC_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -324,9 +328,10 @@ class EventMocTPMinted(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -345,13 +350,14 @@ class EventMocTPMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -446,9 +452,10 @@ class EventMocTPRedeemed(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -467,13 +474,14 @@ class EventMocTPRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTP: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -568,9 +576,10 @@ class EventMocTPSwappedForTP(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["iFrom_"] = sanitize_address(parsed["iFrom_"])
         d_tx["iTo_"] = sanitize_address(parsed["iTo_"])
@@ -590,13 +599,14 @@ class EventMocTPSwappedForTP(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTPfrom_: [{3}] qTPto_: [{4}] qACfee_: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTPfrom_: [{3}] qTPto_: [{4}] qACfee_: [{5}] qACfee_: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTPfrom_"],
             d_tx["qTPto_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -634,9 +644,10 @@ class EventMocTPSwappedForTC(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -655,13 +666,14 @@ class EventMocTPSwappedForTC(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qTC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qTC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{6}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTP_"],
             d_tx["qTC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -699,9 +711,10 @@ class EventMocTCSwappedForTP(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -720,13 +733,14 @@ class EventMocTCSwappedForTP(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{3}] qTP: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{3}] qTP: [{4}] qACfee: [{5}] qACfee: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTC_"],
             d_tx["qTP_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -763,9 +777,10 @@ class EventMocTCandTPRedeemed(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -785,7 +800,7 @@ class EventMocTCandTPRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qTP: [{4}] qAC: [{5}] qACfee: [{6}] Tx Hash: [{7}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qTP: [{4}] qAC: [{5}] qACfee: [{6}] qFeeToken: [{7}] Tx Hash: [{8}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
@@ -793,6 +808,7 @@ class EventMocTCandTPRedeemed(BaseEvent):
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
@@ -829,9 +845,10 @@ class EventMocTCandTPMinted(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -851,7 +868,7 @@ class EventMocTCandTPMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
@@ -859,6 +876,7 @@ class EventMocTCandTPMinted(BaseEvent):
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
