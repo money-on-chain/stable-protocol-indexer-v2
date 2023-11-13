@@ -3,12 +3,12 @@ from .base.main import ConnectionHelperMongo
 from .base.token import ERC20Token
 from .tasks_manager import TasksManager
 from .logger import log
-from .contracts import Multicall2, MocCAWrapper, MocCABag, FastBtcBridge
+from .contracts import Multicall2, MocWrapper, Moc, FastBtcBridge
 from .scan_raw_transactions import ScanRawTxs
 from .scan_logs_transactions import ScanLogsTransactions
 from .scan_transactions_status import ScanTxStatus
 
-__VERSION__ = '4.0.4'
+__VERSION__ = '4.0.5'
 
 log.info("Starting Protocol Indexer version {0}".format(__VERSION__))
 
@@ -42,17 +42,21 @@ class StableIndexerTasks(TasksManager):
             contract_address=self.config['addresses']['Multicall2'])
         #self.contracts_addresses['Multicall2'] = self.contracts_loaded["Multicall2"].address().lower()
 
-        # MocCAWrapper
-        self.contracts_loaded["MocCAWrapper"] = MocCAWrapper(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['MocCAWrapper'])
-        self.contracts_addresses['MocCAWrapper'] = self.contracts_loaded["MocCAWrapper"].address().lower()
+        # Only load with collateral == bag
+        if self.config['collateral'] == "bag":
+            # MocCAWrapper
+            self.contracts_loaded["MocWrapper"] = MocWrapper(
+                self.connection_helper.connection_manager,
+                self.config,
+                contract_address=self.config['addresses']['MocWrapper'])
+            self.contracts_addresses['MocWrapper'] = self.contracts_loaded["MocWrapper"].address().lower()
 
-        # MocCABag
-        self.contracts_loaded["MocCABag"] = MocCABag(
+        # Moc
+        self.contracts_loaded["Moc"] = Moc(
             self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['MocCABag'])
-        self.contracts_addresses['MocCABag'] = self.contracts_loaded["MocCABag"].address().lower()
+            self.config,
+            contract_address=self.config['addresses']['Moc'])
+        self.contracts_addresses['Moc'] = self.contracts_loaded["Moc"].address().lower()
 
         # Token TC
         self.contracts_loaded["TC"] = ERC20Token(
@@ -60,31 +64,27 @@ class StableIndexerTasks(TasksManager):
             contract_address=self.config['addresses']['TC'])
         self.contracts_addresses['TC'] = self.contracts_loaded["TC"].address().lower()
 
-        # Token TP_0
-        self.contracts_loaded["TP_0"] = ERC20Token(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['TP_0'])
-        self.contracts_addresses['TP_0'] = self.contracts_loaded["TP_0"].address().lower()
+        # TP Tokens load
+        self.contracts_loaded["TP"] = list()
+        self.contracts_addresses['TP'] = list()
+        for t_pegged in self.config['addresses']['TP']:
+            self.contracts_loaded["TP"].append(
+                ERC20Token(
+                    self.connection_helper.connection_manager,
+                    contract_address=t_pegged)
+            )
+            self.contracts_addresses['TP'].append(t_pegged.lower())
 
-        # Token TP_1
-        if 'TP_1' in self.config['addresses']:
-            self.contracts_loaded["TP_1"] = ERC20Token(
-                self.connection_helper.connection_manager,
-                contract_address=self.config['addresses']['TP_1'])
-            self.contracts_addresses['TP_1'] = self.contracts_loaded["TP_1"].address().lower()
-
-        # Token CA_0
-        self.contracts_loaded["CA_0"] = ERC20Token(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['CA_0'])
-        self.contracts_addresses['CA_0'] = self.contracts_loaded["CA_0"].address().lower()
-
-        # Token CA_1
-        if 'CA_1' in self.config['addresses']:
-            self.contracts_loaded["CA_1"] = ERC20Token(
-                self.connection_helper.connection_manager,
-                contract_address=self.config['addresses']['CA_1'])
-            self.contracts_addresses['CA_1'] = self.contracts_loaded["CA_1"].address().lower()
+        # CA Tokens load
+        self.contracts_loaded["CA"] = list()
+        self.contracts_addresses['CA'] = list()
+        for c_asset in self.config['addresses']['CA']:
+            self.contracts_loaded["CA"].append(
+                ERC20Token(
+                    self.connection_helper.connection_manager,
+                    contract_address=c_asset)
+            )
+            self.contracts_addresses['CA'].append(c_asset.lower())
 
         # Token TG
         if 'TG' in self.config['addresses']:
@@ -99,7 +99,15 @@ class StableIndexerTasks(TasksManager):
             contract_address=self.config['addresses']['FastBtcBridge'])
         self.contracts_addresses['FastBtcBridge'] = self.config['addresses']['FastBtcBridge']
 
-        self.filter_contracts_addresses = [v.lower() for k, v in self.contracts_addresses.items()]
+        self.filter_contracts_addresses = []
+        for k, v in self.contracts_addresses.items():
+            if isinstance(v, list):
+                for v2 in v:
+                    self.filter_contracts_addresses.append(v2.lower())
+            elif isinstance(v, str):
+                self.filter_contracts_addresses.append(v.lower())
+            else:
+                raise Exception("Filter address not recognize!")
 
     def schedule_tasks(self):
 

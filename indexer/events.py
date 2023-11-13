@@ -53,7 +53,7 @@ class BaseEvent:
         return status, confirmation_time, confirming_percent
 
 
-class EventMocCABagTCMinted(BaseEvent):
+class EventMocTCMinted(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -85,15 +85,19 @@ class EventMocCABagTCMinted(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -102,19 +106,20 @@ class EventMocCABagTCMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] TC: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: {6}".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] TC: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: {7}".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTC_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
 
 
-class EventMocCABagTCMintedWithWrapper(BaseEvent):
+class EventMocTCMintedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -169,7 +174,7 @@ class EventMocCABagTCMintedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTCRedeemed(BaseEvent):
+class EventMocTCRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -201,15 +206,19 @@ class EventMocCABagTCRedeemed(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
         d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -218,19 +227,20 @@ class EventMocCABagTCRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTC_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
 
 
-class EventMocCABagTCRedeemedWithWrapper(BaseEvent):
+class EventMocTCRedeemedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -286,7 +296,7 @@ class EventMocCABagTCRedeemedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPMinted(BaseEvent):
+class EventMocTPMinted(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -318,9 +328,10 @@ class EventMocCABagTPMinted(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -328,6 +339,9 @@ class EventMocCABagTPMinted(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
                         
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -336,19 +350,20 @@ class EventMocCABagTPMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
 
 
-class EventMocCABagTPMintedWithWrapper(BaseEvent):
+class EventMocTPMintedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -405,7 +420,7 @@ class EventMocCABagTPMintedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPRedeemed(BaseEvent):
+class EventMocTPRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -437,9 +452,10 @@ class EventMocCABagTPRedeemed(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -447,6 +463,9 @@ class EventMocCABagTPRedeemed(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -455,19 +474,20 @@ class EventMocCABagTPRedeemed(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTP: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
 
 
-class EventMocCABagTPRedeemedWithWrapper(BaseEvent):
+class EventMocTPRedeemedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -524,7 +544,7 @@ class EventMocCABagTPRedeemedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPSwappedForTP(BaseEvent):
+class EventMocTPSwappedForTP(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -556,9 +576,10 @@ class EventMocCABagTPSwappedForTP(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["iFrom_"] = sanitize_address(parsed["iFrom_"])
         d_tx["iTo_"] = sanitize_address(parsed["iTo_"])
@@ -567,6 +588,9 @@ class EventMocCABagTPSwappedForTP(BaseEvent):
         d_tx["qTPfrom_"] = str(parsed["qTPfrom_"])
         d_tx["qTPto_"] = str(parsed["qTPto_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -575,19 +599,20 @@ class EventMocCABagTPSwappedForTP(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTPfrom_: [{3}] qTPto_: [{4}] qACfee_: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTPfrom_: [{3}] qTPto_: [{4}] qACfee_: [{5}] qACfee_: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTPfrom_"],
             d_tx["qTPto_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
 
 
-class EventMocCABagTPSwappedForTC(BaseEvent):
+class EventMocTPSwappedForTC(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -619,9 +644,10 @@ class EventMocCABagTPSwappedForTC(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -629,6 +655,9 @@ class EventMocCABagTPSwappedForTC(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -637,19 +666,20 @@ class EventMocCABagTPSwappedForTC(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qTC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTP: [{3}] qTC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{6}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTP_"],
             d_tx["qTC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
 
 
-class EventMocCABagTCSwappedForTP(BaseEvent):
+class EventMocTCSwappedForTP(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -681,9 +711,10 @@ class EventMocCABagTCSwappedForTP(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -691,6 +722,9 @@ class EventMocCABagTCSwappedForTP(BaseEvent):
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -699,19 +733,20 @@ class EventMocCABagTCSwappedForTP(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{3}] qTP: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{3}] qTP: [{4}] qACfee: [{5}] qACfee: [{6}] Tx Hash: [{7}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
             d_tx["qTC_"],
             d_tx["qTP_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed
 
 
-class EventMocCABagTCandTPRedeemed(BaseEvent):
+class EventMocTCandTPRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -742,72 +777,10 @@ class EventMocCABagTCandTPRedeemed(BaseEvent):
 
         # only save if recipient is not the wrapper as address
         recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
-
-        d_tx["i_"] = sanitize_address(parsed["i_"])
-        d_tx["sender_"] = sanitize_address(parsed["sender_"])
-        d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
-        d_tx["qTC_"] = str(parsed["qTC_"])
-        d_tx["qTP_"] = str(parsed["qTP_"])
-        d_tx["qAC_"] = str(parsed["qAC_"])
-        d_tx["qACfee_"] = str(parsed["qACfee_"])
-
-        post_id = collection_tx.find_one_and_update(
-            {"transactionHash": tx_hash,
-             "event": d_tx["event"]},
-            {"$set": d_tx},
-            upsert=True)
-        d_tx['post_id'] = post_id
-
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qTP: [{4}] qAC: [{5}] qACfee: [{6}] Tx Hash: [{7}]".format(
-            d_tx["event"],
-            d_tx["sender_"],
-            d_tx["recipient_"],
-            d_tx["qTC_"],
-            d_tx["qTP_"],
-            d_tx["qAC_"],
-            d_tx["qACfee_"],
-            tx_hash))
-
-        return parsed
-
-
-class EventMocCABagTCandTPMinted(BaseEvent):
-
-    def parse_event_and_save(self, parsed_receipt, decoded_event):
-        parsed = self.parse_event(parsed_receipt, decoded_event)
-
-        # status of tx
-        status, confirmation_time, confirming_percent = self.confirming_percent(parsed)
-
-        # get collection transaction
-        collection_tx = self.connection_helper.mongo_collection('Transaction')
-
-        tx_hash = parsed['hash']
-
-        d_tx = OrderedDict()
-        d_tx["blockNumber"] = parsed_receipt["blockNumber"]
-        d_tx["event"] = parsed_receipt['eventName']
-        d_tx["transactionHash"] = tx_hash
-        d_tx["processLogs"] = True
-        d_tx["createdAt"] = parsed_receipt['createdAt']
-        d_tx["gas"] = parsed['gas']
-        d_tx["gasPrice"] = str(parsed['gasPrice'])
-        d_tx["gasUsed"] = parsed['gasUsed']
-        d_tx["confirmationTime"] = confirmation_time
-        d_tx['confirmingPercent'] = confirming_percent
-        d_tx["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
-        d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
-        d_tx["status"] = status
-
-        # only save if recipient is not the wrapper as address
-        recipient = sanitize_address(parsed["recipient_"]).lower()
-        ca_wrapper = self.options['addresses']['MocCAWrapper'].lower()
-        if recipient != ca_wrapper:
-            d_tx["address"] = recipient
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
 
         d_tx["i_"] = sanitize_address(parsed["i_"])
         d_tx["sender_"] = sanitize_address(parsed["sender_"])
@@ -816,6 +789,9 @@ class EventMocCABagTCandTPMinted(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -824,7 +800,7 @@ class EventMocCABagTCandTPMinted(BaseEvent):
             upsert=True)
         d_tx['post_id'] = post_id
 
-        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] Tx Hash: [{6}]".format(
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}]  qTC: [{3}] qTP: [{4}] qAC: [{5}] qACfee: [{6}] qFeeToken: [{7}] Tx Hash: [{8}]".format(
             d_tx["event"],
             d_tx["sender_"],
             d_tx["recipient_"],
@@ -832,6 +808,75 @@ class EventMocCABagTCandTPMinted(BaseEvent):
             d_tx["qTP_"],
             d_tx["qAC_"],
             d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
+            tx_hash))
+
+        return parsed
+
+
+class EventMocTCandTPMinted(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # status of tx
+        status, confirmation_time, confirming_percent = self.confirming_percent(parsed)
+
+        # get collection transaction
+        collection_tx = self.connection_helper.mongo_collection('Transaction')
+
+        tx_hash = parsed['hash']
+
+        d_tx = OrderedDict()
+        d_tx["blockNumber"] = parsed_receipt["blockNumber"]
+        d_tx["event"] = parsed_receipt['eventName']
+        d_tx["transactionHash"] = tx_hash
+        d_tx["processLogs"] = True
+        d_tx["createdAt"] = parsed_receipt['createdAt']
+        d_tx["gas"] = parsed['gas']
+        d_tx["gasPrice"] = str(parsed['gasPrice'])
+        d_tx["gasUsed"] = parsed['gasUsed']
+        d_tx["confirmationTime"] = confirmation_time
+        d_tx['confirmingPercent'] = confirming_percent
+        d_tx["lastUpdatedAt"] = datetime.datetime.now()
+        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_tx["gasFeeRBTC"] = str(int(gas_fee * self.precision))
+        d_tx["status"] = status
+
+        # only save if recipient is not the wrapper as address
+        recipient = sanitize_address(parsed["recipient_"]).lower()
+        if self.options['collateral'] == "bag":
+            ca_wrapper = self.options['addresses']['MocWrapper'].lower()
+            if recipient != ca_wrapper:
+                d_tx["address"] = recipient
+
+        d_tx["i_"] = sanitize_address(parsed["i_"])
+        d_tx["sender_"] = sanitize_address(parsed["sender_"])
+        d_tx["recipient_"] = sanitize_address(parsed["recipient_"])
+        d_tx["qTC_"] = str(parsed["qTC_"])
+        d_tx["qTP_"] = str(parsed["qTP_"])
+        d_tx["qAC_"] = str(parsed["qAC_"])
+        d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
+
+        post_id = collection_tx.find_one_and_update(
+            {"transactionHash": tx_hash,
+             "event": d_tx["event"]},
+            {"$set": d_tx},
+            upsert=True)
+        d_tx['post_id'] = post_id
+
+        log.info("Tx {0} - Sender: [{1}] Recipient: [{2}] qTC: [{2}] qTP: [{3}] qAC: [{4}] qACfee: [{5}] qFeeToken: [{6}] Tx Hash: [{7}]".format(
+            d_tx["event"],
+            d_tx["sender_"],
+            d_tx["recipient_"],
+            d_tx["qTC_"],
+            d_tx["qTP_"],
+            d_tx["qAC_"],
+            d_tx["qACfee_"],
+            d_tx["qFeeToken_"],
             tx_hash))
 
         return parsed

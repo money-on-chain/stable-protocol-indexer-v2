@@ -1,10 +1,10 @@
 {
   "uri": "https://public-node.testnet.rsk.co",
   "collateral": "rc20",
-  "app_project": "roc",
+  "app_project": "flipago",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "roc_v2_testnet"
+    "db": "flipago"
   },
   "debug": true,
   "tasks": {
@@ -37,10 +37,10 @@
   },
   "addresses": {
     "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "Moc": "0x02fd24648BcD6283216bc0C9E5c97a7FE9fA9dc2",
-    "TC": "0x4E8724016eC482f103cf5A300728A7c53759DAb0",
-    "TP": ["0x573CEe6119b312EFDEA1BC7df65E55D1D2E26bfC"],
-    "CA": ["0x19F64674D8A5B4E652319F5e239eFd3bc969A1fE"],
+    "Moc": "0xE481663CB5E5C41CF528d146DC221D2489Fdc451",
+    "TC": "0x483B9872C20B6D04845Eb69378bED0FbbBA07bBB",
+    "TP": ["0x10091352b607f588ef85F9Ff53012F4c4322655C", "0xEF6B253529b9275d225fD06705169CD5159B9BAE"],
+    "CA": ["0xCB46c0ddc60D18eFEB0E586C17Af6ea36452Dae0"],
     "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A"
   }
 }
