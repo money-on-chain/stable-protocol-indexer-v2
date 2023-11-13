@@ -3,22 +3,22 @@ import datetime
 from collections import OrderedDict
 
 from .logger import log
-from .events import EventMocCABagTCMinted, \
-    EventMocCABagTCRedeemed, \
-    EventMocCABagTPMinted, \
-    EventMocCABagTPRedeemed, \
-    EventMocCABagTPSwappedForTP, \
-    EventMocCABagTPSwappedForTC, \
-    EventMocCABagTCSwappedForTP, \
-    EventMocCABagTCandTPRedeemed, \
-    EventMocCABagTCandTPMinted, \
+from .events import EventMocTCMinted, \
+    EventMocTCRedeemed, \
+    EventMocTPMinted, \
+    EventMocTPRedeemed, \
+    EventMocTPSwappedForTP, \
+    EventMocTPSwappedForTC, \
+    EventMocTCSwappedForTP, \
+    EventMocTCandTPRedeemed, \
+    EventMocTCandTPMinted, \
     EventTokenTransfer, \
     EventFastBtcBridgeNewBitcoinTransfer, \
     EventFastBtcBridgeBitcoinTransferStatusUpdated, \
-    EventMocCABagTCMintedWithWrapper, \
-    EventMocCABagTCRedeemedWithWrapper, \
-    EventMocCABagTPMintedWithWrapper, \
-    EventMocCABagTPRedeemedWithWrapper
+    EventMocTCMintedWithWrapper, \
+    EventMocTCRedeemedWithWrapper, \
+    EventMocTPMintedWithWrapper, \
+    EventMocTPRedeemedWithWrapper
 
 
 from .base.decoder import LogDecoder, UnknownEvent
@@ -56,33 +56,39 @@ class ScanLogsTransactions:
     def init_log_decoder(self):
 
         contracts_log_decoder = dict()
-        contracts_log_decoder[self.contracts_addresses['MocCABag'].lower()] = LogDecoder(
-            self.contracts_loaded['MocCABag'].sc
+        contracts_log_decoder[self.contracts_addresses['Moc'].lower()] = LogDecoder(
+            self.contracts_loaded['Moc'].sc
         )
-        contracts_log_decoder[self.contracts_addresses['MocCAWrapper'].lower()] = LogDecoder(
-            self.contracts_loaded['MocCAWrapper'].sc
-        )
+
+        # Only load with collateral == bag
+        if self.options['collateral'] == "bag":
+            contracts_log_decoder[self.contracts_addresses['MocWrapper'].lower()] = LogDecoder(
+                self.contracts_loaded['MocWrapper'].sc
+            )
+
         contracts_log_decoder[self.contracts_addresses['TC'].lower()] = LogDecoder(
             self.contracts_loaded['TC'].sc
         )
-        contracts_log_decoder[self.contracts_addresses['TP_0'].lower()] = LogDecoder(
-            self.contracts_loaded['TP_0'].sc
-        )
-        if 'TP_1' in self.options['addresses']:
-            contracts_log_decoder[self.contracts_addresses['TP_1'].lower()] = LogDecoder(
-                self.contracts_loaded['TP_1'].sc
+
+        i = 0
+        for t_pegged in self.options['addresses']['TP']:
+            contracts_log_decoder[t_pegged.lower()] = LogDecoder(
+                self.contracts_loaded['TP'][i].sc
             )
-        contracts_log_decoder[self.contracts_addresses['CA_0'].lower()] = LogDecoder(
-            self.contracts_loaded['CA_0'].sc
-        )
-        if 'CA_1' in self.options['addresses']:
-            contracts_log_decoder[self.contracts_addresses['CA_1'].lower()] = LogDecoder(
-                self.contracts_loaded['CA_1'].sc
+            i += 1
+
+        i = 0
+        for c_asset in self.options['addresses']['CA']:
+            contracts_log_decoder[c_asset.lower()] = LogDecoder(
+                self.contracts_loaded['CA'][i].sc
             )
+            i += 1
+
         if 'TG' in self.options['addresses']:
             contracts_log_decoder[self.contracts_addresses['TG'].lower()] = LogDecoder(
                 self.contracts_loaded['TG'].sc
             )
+
         contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
             self.contracts_loaded['FastBtcBridge'].sc
         )
@@ -106,76 +112,78 @@ class ScanLogsTransactions:
     def map_events(self):
 
         d_event = dict()
-        d_event[self.contracts_addresses["MocCABag"].lower()] = {
-            "TCMinted": EventMocCABagTCMinted(
+        d_event[self.contracts_addresses["Moc"].lower()] = {
+            "TCMinted": EventMocTCMinted(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCRedeemed": EventMocCABagTCRedeemed(
+            "TCRedeemed": EventMocTCRedeemed(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPMinted": EventMocCABagTPMinted(
+            "TPMinted": EventMocTPMinted(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPRedeemed": EventMocCABagTPRedeemed(
+            "TPRedeemed": EventMocTPRedeemed(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPSwappedForTP": EventMocCABagTPSwappedForTP(
+            "TPSwappedForTP": EventMocTPSwappedForTP(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPSwappedForTC": EventMocCABagTPSwappedForTC(
+            "TPSwappedForTC": EventMocTPSwappedForTC(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCSwappedForTP": EventMocCABagTCSwappedForTP(
+            "TCSwappedForTP": EventMocTCSwappedForTP(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCandTPRedeemed": EventMocCABagTCandTPRedeemed(
+            "TCandTPRedeemed": EventMocTCandTPRedeemed(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCandTPMinted": EventMocCABagTCandTPMinted(
+            "TCandTPMinted": EventMocTCandTPMinted(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
         }
 
-        d_event[self.contracts_addresses["MocCAWrapper"].lower()] = {
-            "TCMintedWithWrapper": EventMocCABagTCMintedWithWrapper(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TCRedeemedWithWrapper": EventMocCABagTCRedeemedWithWrapper(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TPMintedWithWrapper": EventMocCABagTPMintedWithWrapper(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TPRedeemedWithWrapper": EventMocCABagTPRedeemedWithWrapper(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info)
-        }
+        # Only load with collateral == bag
+        if self.options['collateral'] == "bag":
+            d_event[self.contracts_addresses["MocWrapper"].lower()] = {
+                "TCMintedWithWrapper": EventMocTCMintedWithWrapper(
+                    self.options,
+                    self.connection_helper,
+                    self.filter_contracts_addresses,
+                    self.block_info),
+                "TCRedeemedWithWrapper": EventMocTCRedeemedWithWrapper(
+                    self.options,
+                    self.connection_helper,
+                    self.filter_contracts_addresses,
+                    self.block_info),
+                "TPMintedWithWrapper": EventMocTPMintedWithWrapper(
+                    self.options,
+                    self.connection_helper,
+                    self.filter_contracts_addresses,
+                    self.block_info),
+                "TPRedeemedWithWrapper": EventMocTPRedeemedWithWrapper(
+                    self.options,
+                    self.connection_helper,
+                    self.filter_contracts_addresses,
+                    self.block_info)
+            }
 
         d_event[self.contracts_addresses["TC"].lower()] = {
             "Transfer": EventTokenTransfer(
@@ -186,43 +194,29 @@ class ScanLogsTransactions:
                 'TC')
         }
 
-        d_event[self.contracts_addresses["TP_0"].lower()] = {
-            "Transfer": EventTokenTransfer(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info,
-                'TP_0')
-        }
-
-        if 'TP_1' in self.options['addresses']:
-            d_event[self.contracts_addresses["TP_1"].lower()] = {
+        i = 0
+        for t_pegged in self.options['addresses']['TP']:
+            d_event[t_pegged.lower()] = {
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
                     self.filter_contracts_addresses,
                     self.block_info,
-                    'TP_1')
+                    'TP_{0}'.format(i))
             }
+            i += 1
 
-        d_event[self.contracts_addresses["CA_0"].lower()] = {
-            "Transfer": EventTokenTransfer(
-                self.options,
-                self.connection_helper,
-                self.filter_contracts_addresses,
-                self.block_info,
-                'CA_0')
-        }
-
-        if 'CA_1' in self.options['addresses']:
-            d_event[self.contracts_addresses["CA_1"].lower()] = {
+        i = 0
+        for c_asset in self.options['addresses']['CA']:
+            d_event[c_asset.lower()] = {
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
                     self.filter_contracts_addresses,
                     self.block_info,
-                    'CA_1')
+                    'CA_{0}'.format(i))
             }
+            i += 1
 
         if 'TG' in self.options['addresses']:
             d_event[self.contracts_addresses["TG"].lower()] = {

@@ -94,16 +94,23 @@ class Multicall2(Contract):
         return results[0], decoded_results, d_validity
 
 
-class MocCAWrapper(Contract):
+class MocWrapper(Contract):
 
     log = logging.getLogger()
     precision = 10 ** 18
 
-    contract_name = 'MocCAWrapper'
+    contract_name = 'MocWrapper'
     contract_abi = Contract.content_abi_file(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago/MocCAWrapper.abi'))
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago_bag/MocWrapper.abi'))
 
-    def __init__(self, connection_manager, contract_address=None, contract_abi=None, contract_bin=None):
+    def __init__(self, connection_manager, config, contract_address=None, contract_abi=None, contract_bin=None):
+
+        self.contract_abi = Contract.content_abi_file(
+            os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'abi/{0}/MocWrapper.abi'.format(config['app_project'])
+            )
+        )
 
         super().__init__(connection_manager,
                          contract_address=contract_address,
@@ -114,16 +121,23 @@ class MocCAWrapper(Contract):
         self.load_contract()
 
 
-class MocCABag(Contract):
+class Moc(Contract):
 
     log = logging.getLogger()
     precision = 10 ** 18
 
-    contract_name = 'MocCABag'
+    contract_name = 'Moc'
     contract_abi = Contract.content_abi_file(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago/MocCABag.abi'))
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago_bag/Moc.abi'))
 
-    def __init__(self, connection_manager, contract_address=None, contract_abi=None, contract_bin=None):
+    def __init__(self, connection_manager, config, contract_address=None, contract_abi=None, contract_bin=None):
+
+        self.contract_abi = Contract.content_abi_file(
+            os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'abi/{0}/Moc.abi'.format(config['app_project'])
+            )
+        )
 
         super().__init__(connection_manager,
                          contract_address=contract_address,

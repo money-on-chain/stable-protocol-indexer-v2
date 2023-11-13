@@ -53,7 +53,7 @@ class BaseEvent:
         return status, confirmation_time, confirming_percent
 
 
-class EventMocCABagTCMinted(BaseEvent):
+class EventMocTCMinted(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -94,6 +94,9 @@ class EventMocCABagTCMinted(BaseEvent):
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -114,7 +117,7 @@ class EventMocCABagTCMinted(BaseEvent):
         return parsed
 
 
-class EventMocCABagTCMintedWithWrapper(BaseEvent):
+class EventMocTCMintedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -169,7 +172,7 @@ class EventMocCABagTCMintedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTCRedeemed(BaseEvent):
+class EventMocTCRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -210,6 +213,9 @@ class EventMocCABagTCRedeemed(BaseEvent):
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -230,7 +236,7 @@ class EventMocCABagTCRedeemed(BaseEvent):
         return parsed
 
 
-class EventMocCABagTCRedeemedWithWrapper(BaseEvent):
+class EventMocTCRedeemedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -286,7 +292,7 @@ class EventMocCABagTCRedeemedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPMinted(BaseEvent):
+class EventMocTPMinted(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -328,6 +334,9 @@ class EventMocCABagTPMinted(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
                         
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -348,7 +357,7 @@ class EventMocCABagTPMinted(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPMintedWithWrapper(BaseEvent):
+class EventMocTPMintedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -405,7 +414,7 @@ class EventMocCABagTPMintedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPRedeemed(BaseEvent):
+class EventMocTPRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -447,6 +456,9 @@ class EventMocCABagTPRedeemed(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -467,7 +479,7 @@ class EventMocCABagTPRedeemed(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPRedeemedWithWrapper(BaseEvent):
+class EventMocTPRedeemedWithWrapper(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -524,7 +536,7 @@ class EventMocCABagTPRedeemedWithWrapper(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPSwappedForTP(BaseEvent):
+class EventMocTPSwappedForTP(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -567,6 +579,9 @@ class EventMocCABagTPSwappedForTP(BaseEvent):
         d_tx["qTPfrom_"] = str(parsed["qTPfrom_"])
         d_tx["qTPto_"] = str(parsed["qTPto_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -587,7 +602,7 @@ class EventMocCABagTPSwappedForTP(BaseEvent):
         return parsed
 
 
-class EventMocCABagTPSwappedForTC(BaseEvent):
+class EventMocTPSwappedForTC(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -629,6 +644,9 @@ class EventMocCABagTPSwappedForTC(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -649,7 +667,7 @@ class EventMocCABagTPSwappedForTC(BaseEvent):
         return parsed
 
 
-class EventMocCABagTCSwappedForTP(BaseEvent):
+class EventMocTCSwappedForTP(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -691,6 +709,9 @@ class EventMocCABagTCSwappedForTP(BaseEvent):
         d_tx["qTC_"] = str(parsed["qTC_"])
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -711,7 +732,7 @@ class EventMocCABagTCSwappedForTP(BaseEvent):
         return parsed
 
 
-class EventMocCABagTCandTPRedeemed(BaseEvent):
+class EventMocTCandTPRedeemed(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -753,6 +774,9 @@ class EventMocCABagTCandTPRedeemed(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
@@ -774,7 +798,7 @@ class EventMocCABagTCandTPRedeemed(BaseEvent):
         return parsed
 
 
-class EventMocCABagTCandTPMinted(BaseEvent):
+class EventMocTCandTPMinted(BaseEvent):
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -816,6 +840,9 @@ class EventMocCABagTCandTPMinted(BaseEvent):
         d_tx["qTP_"] = str(parsed["qTP_"])
         d_tx["qAC_"] = str(parsed["qAC_"])
         d_tx["qACfee_"] = str(parsed["qACfee_"])
+        d_tx["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
+        d_tx["qFeeToken_"] = str(parsed["qFeeToken_"])
+        d_tx["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
 
         post_id = collection_tx.find_one_and_update(
             {"transactionHash": tx_hash,
