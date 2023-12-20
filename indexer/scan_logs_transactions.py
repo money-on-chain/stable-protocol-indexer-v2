@@ -3,22 +3,27 @@ import datetime
 from collections import OrderedDict
 
 from .logger import log
-from .events import EventMocTCMinted, \
-    EventMocTCRedeemed, \
-    EventMocTPMinted, \
-    EventMocTPRedeemed, \
-    EventMocTPSwappedForTP, \
-    EventMocTPSwappedForTC, \
-    EventMocTCSwappedForTP, \
-    EventMocTCandTPRedeemed, \
-    EventMocTCandTPMinted, \
+from .events import EventMocQueueTCMinted, \
+    EventMocQueueTCRedeemed, \
+    EventMocQueueTPMinted, \
+    EventMocQueueTPRedeemed, \
+    EventMocQueueTPSwappedForTP, \
+    EventMocQueueTPSwappedForTC, \
+    EventMocQueueTCSwappedForTP, \
+    EventMocQueueTCandTPRedeemed, \
+    EventMocQueueTCandTPMinted, \
     EventTokenTransfer, \
     EventFastBtcBridgeNewBitcoinTransfer, \
     EventFastBtcBridgeBitcoinTransferStatusUpdated, \
-    EventMocTCMintedWithWrapper, \
-    EventMocTCRedeemedWithWrapper, \
-    EventMocTPMintedWithWrapper, \
-    EventMocTPRedeemedWithWrapper
+    EventMocQueueOperationError, \
+    EventMocQueueUnhandledError, \
+    EventMocQueueOperationQueued, \
+    EventMocQueueOperationExecuted, \
+    EventMocLiqTPRedeemed, \
+    EventMocSuccessFeeDistributed, \
+    EventMocSettlementExecuted, \
+    EventMocTCInterestPayment, \
+    EventMocTPemaUpdated
 
 
 from .base.decoder import LogDecoder, UnknownEvent
@@ -60,11 +65,9 @@ class ScanLogsTransactions:
             self.contracts_loaded['Moc'].sc
         )
 
-        # Only load with collateral == bag
-        if self.options['collateral'] == "bag":
-            contracts_log_decoder[self.contracts_addresses['MocWrapper'].lower()] = LogDecoder(
-                self.contracts_loaded['MocWrapper'].sc
-            )
+        contracts_log_decoder[self.contracts_addresses['MocQueue'].lower()] = LogDecoder(
+            self.contracts_loaded['MocQueue'].sc
+        )
 
         contracts_log_decoder[self.contracts_addresses['TC'].lower()] = LogDecoder(
             self.contracts_loaded['TC'].sc
@@ -113,77 +116,100 @@ class ScanLogsTransactions:
 
         d_event = dict()
         d_event[self.contracts_addresses["Moc"].lower()] = {
-            "TCMinted": EventMocTCMinted(
+            "LiqTPRedeemed": EventMocLiqTPRedeemed(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCRedeemed": EventMocTCRedeemed(
+            "SuccessFeeDistributed": EventMocSuccessFeeDistributed(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPMinted": EventMocTPMinted(
+            "SettlementExecuted": EventMocSettlementExecuted(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPRedeemed": EventMocTPRedeemed(
+            "TCInterestPayment": EventMocTCInterestPayment(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPSwappedForTP": EventMocTPSwappedForTP(
+            "TPemaUpdated": EventMocTPemaUpdated(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses["MocQueue"].lower()] = {
+            "OperationError": EventMocQueueOperationError(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPSwappedForTC": EventMocTPSwappedForTC(
+            "UnhandledError": EventMocQueueUnhandledError(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCSwappedForTP": EventMocTCSwappedForTP(
+            "OperationQueued": EventMocQueueOperationQueued(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCandTPRedeemed": EventMocTCandTPRedeemed(
+            "OperationExecuted": EventMocQueueOperationExecuted(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCandTPMinted": EventMocTCandTPMinted(
+            "TCMinted": EventMocQueueTCMinted(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCRedeemed": EventMocQueueTCRedeemed(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPMinted": EventMocQueueTPMinted(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPRedeemed": EventMocQueueTPRedeemed(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPSwappedForTP": EventMocQueueTPSwappedForTP(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPSwappedForTC": EventMocQueueTPSwappedForTC(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCSwappedForTP": EventMocQueueTCSwappedForTP(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCandTPRedeemed": EventMocQueueTCandTPRedeemed(
+                self.options,
+                self.connection_helper,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCandTPMinted": EventMocQueueTCandTPMinted(
                 self.options,
                 self.connection_helper,
                 self.filter_contracts_addresses,
                 self.block_info),
         }
-
-        # Only load with collateral == bag
-        if self.options['collateral'] == "bag":
-            d_event[self.contracts_addresses["MocWrapper"].lower()] = {
-                "TCMintedWithWrapper": EventMocTCMintedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info),
-                "TCRedeemedWithWrapper": EventMocTCRedeemedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info),
-                "TPMintedWithWrapper": EventMocTPMintedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info),
-                "TPRedeemedWithWrapper": EventMocTPRedeemedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info)
-            }
 
         d_event[self.contracts_addresses["TC"].lower()] = {
             "Transfer": EventTokenTransfer(

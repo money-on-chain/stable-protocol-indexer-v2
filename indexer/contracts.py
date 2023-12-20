@@ -94,21 +94,21 @@ class Multicall2(Contract):
         return results[0], decoded_results, d_validity
 
 
-class MocWrapper(Contract):
+class Moc(Contract):
 
     log = logging.getLogger()
     precision = 10 ** 18
 
-    contract_name = 'MocWrapper'
+    contract_name = 'Moc'
     contract_abi = Contract.content_abi_file(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago_bag/MocWrapper.abi'))
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago/Moc.abi'))
 
     def __init__(self, connection_manager, config, contract_address=None, contract_abi=None, contract_bin=None):
 
         self.contract_abi = Contract.content_abi_file(
             os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
-                'abi/{0}/MocWrapper.abi'.format(config['app_project'])
+                'abi/{0}/Moc.abi'.format(config['app_project'])
             )
         )
 
@@ -121,21 +121,21 @@ class MocWrapper(Contract):
         self.load_contract()
 
 
-class Moc(Contract):
+class MocQueue(Contract):
 
     log = logging.getLogger()
     precision = 10 ** 18
 
-    contract_name = 'Moc'
+    contract_name = 'MocQueue'
     contract_abi = Contract.content_abi_file(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago_bag/Moc.abi'))
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), 'abi/flipago/MocQueue.abi'))
 
     def __init__(self, connection_manager, config, contract_address=None, contract_abi=None, contract_bin=None):
 
         self.contract_abi = Contract.content_abi_file(
             os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
-                'abi/{0}/Moc.abi'.format(config['app_project'])
+                'abi/{0}/MocQueue.abi'.format(config['app_project'])
             )
         )
 

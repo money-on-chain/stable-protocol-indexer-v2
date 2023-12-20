@@ -3,12 +3,12 @@ from .base.main import ConnectionHelperMongo
 from .base.token import ERC20Token
 from .tasks_manager import TasksManager
 from .logger import log
-from .contracts import Multicall2, MocWrapper, Moc, FastBtcBridge
+from .contracts import Multicall2, Moc, FastBtcBridge, MocQueue
 from .scan_raw_transactions import ScanRawTxs
 from .scan_logs_transactions import ScanLogsTransactions
 from .scan_transactions_status import ScanTxStatus
 
-__VERSION__ = '4.0.5'
+__VERSION__ = '4.1.0'
 
 log.info("Starting Protocol Indexer version {0}".format(__VERSION__))
 
@@ -42,21 +42,19 @@ class StableIndexerTasks(TasksManager):
             contract_address=self.config['addresses']['Multicall2'])
         #self.contracts_addresses['Multicall2'] = self.contracts_loaded["Multicall2"].address().lower()
 
-        # Only load with collateral == bag
-        if self.config['collateral'] == "bag":
-            # MocCAWrapper
-            self.contracts_loaded["MocWrapper"] = MocWrapper(
-                self.connection_helper.connection_manager,
-                self.config,
-                contract_address=self.config['addresses']['MocWrapper'])
-            self.contracts_addresses['MocWrapper'] = self.contracts_loaded["MocWrapper"].address().lower()
-
         # Moc
         self.contracts_loaded["Moc"] = Moc(
             self.connection_helper.connection_manager,
             self.config,
             contract_address=self.config['addresses']['Moc'])
         self.contracts_addresses['Moc'] = self.contracts_loaded["Moc"].address().lower()
+
+        # MocQueue
+        self.contracts_loaded["MocQueue"] = Moc(
+            self.connection_helper.connection_manager,
+            self.config,
+            contract_address=self.config['addresses']['MocQueue'])
+        self.contracts_addresses['MocQueue'] = self.contracts_loaded["MocQueue"].address().lower()
 
         # Token TC
         self.contracts_loaded["TC"] = ERC20Token(
