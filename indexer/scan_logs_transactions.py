@@ -87,9 +87,9 @@ class ScanLogsTransactions:
             )
             i += 1
 
-        if 'TG' in self.options['addresses']:
-            contracts_log_decoder[self.contracts_addresses['TG'].lower()] = LogDecoder(
-                self.contracts_loaded['TG'].sc
+        if 'FeeToken' in self.options['addresses']:
+            contracts_log_decoder[self.contracts_addresses['FeeToken'].lower()] = LogDecoder(
+                self.contracts_loaded['FeeToken'].sc
             )
 
         contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
@@ -265,15 +265,15 @@ class ScanLogsTransactions:
             }
             i += 1
 
-        if 'TG' in self.options['addresses']:
-            d_event[self.contracts_addresses["TG"].lower()] = {
+        if 'FeeToken' in self.options['addresses']:
+            d_event[self.contracts_addresses["FeeToken"].lower()] = {
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
                     self.contracts_loaded,
                     self.filter_contracts_addresses,
                     self.block_info,
-                    'TG')
+                    'FeeToken')
             }
 
         d_event[self.options['addresses']['FastBtcBridge'].lower()] = {

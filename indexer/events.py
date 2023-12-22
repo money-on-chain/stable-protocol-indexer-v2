@@ -197,6 +197,7 @@ class EventMocQueueOperationError(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_event = dict()
         d_event["hash"] = tx_hash
@@ -255,6 +256,7 @@ class EventMocQueueUnhandledError(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_event = dict()
         d_event["hash"] = tx_hash
@@ -313,6 +315,7 @@ class EventMocQueueOperationQueued(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         # Operation Type:
         #
@@ -475,6 +478,7 @@ class EventMocQueueOperationExecuted(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_event = dict()
         d_event["hash"] = tx_hash
@@ -535,6 +539,7 @@ class EventMocQueueTCMinted(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -602,6 +607,7 @@ class EventMocQueueTCRedeemed(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -669,6 +675,7 @@ class EventMocQueueTPMinted(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -736,6 +743,7 @@ class EventMocQueueTPRedeemed(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -804,6 +812,7 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -871,6 +880,7 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -938,6 +948,7 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -1001,10 +1012,12 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -1072,6 +1085,7 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         # -1 Error
         #  0 Queue
         #  1 Executed
+        #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = parsed_receipt["blockNumber"]
@@ -1197,7 +1211,6 @@ class EventFastBtcBridgeNewBitcoinTransfer(BaseEvent):
         d_tx["status"] = 0
         d_tx["timestamp"] = parsed["timestamp"]
         d_tx["updated"] = parsed["timestamp"]
-        d_tx["processLogs"] = True
 
         post_id = collection_bridge.find_one_and_update(
             {"transferId": d_tx["transferId"]},

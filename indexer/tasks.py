@@ -84,12 +84,12 @@ class StableIndexerTasks(TasksManager):
             )
             self.contracts_addresses['CA'].append(c_asset.lower())
 
-        # Token TG
-        if 'TG' in self.config['addresses']:
-            self.contracts_loaded["TG"] = ERC20Token(
+        # Token FeeToken
+        if 'FeeToken' in self.config['addresses']:
+            self.contracts_loaded["FeeToken"] = ERC20Token(
                 self.connection_helper.connection_manager,
-                contract_address=self.config['addresses']['TG'])
-            self.contracts_addresses['TG'] = self.contracts_loaded["TG"].address().lower()
+                contract_address=self.config['addresses']['FeeToken'])
+            self.contracts_addresses['FeeToken'] = self.contracts_loaded["FeeToken"].address().lower()
 
         # FastBTCBridge
         self.contracts_loaded["FastBtcBridge"] = FastBtcBridge(
