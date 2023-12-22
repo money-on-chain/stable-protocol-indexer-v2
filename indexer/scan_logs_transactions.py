@@ -119,26 +119,31 @@ class ScanLogsTransactions:
             "LiqTPRedeemed": EventMocLiqTPRedeemed(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "SuccessFeeDistributed": EventMocSuccessFeeDistributed(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "SettlementExecuted": EventMocSettlementExecuted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TCInterestPayment": EventMocTCInterestPayment(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TPemaUpdated": EventMocTPemaUpdated(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info)
         }
@@ -147,66 +152,79 @@ class ScanLogsTransactions:
             "OperationError": EventMocQueueOperationError(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "UnhandledError": EventMocQueueUnhandledError(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "OperationQueued": EventMocQueueOperationQueued(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "OperationExecuted": EventMocQueueOperationExecuted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TCMinted": EventMocQueueTCMinted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TCRedeemed": EventMocQueueTCRedeemed(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TPMinted": EventMocQueueTPMinted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TPRedeemed": EventMocQueueTPRedeemed(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TPSwappedForTP": EventMocQueueTPSwappedForTP(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TPSwappedForTC": EventMocQueueTPSwappedForTC(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TCSwappedForTP": EventMocQueueTCSwappedForTP(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TCandTPRedeemed": EventMocQueueTCandTPRedeemed(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "TCandTPMinted": EventMocQueueTCandTPMinted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
         }
@@ -215,6 +233,7 @@ class ScanLogsTransactions:
             "Transfer": EventTokenTransfer(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info,
                 'TC')
@@ -226,6 +245,7 @@ class ScanLogsTransactions:
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
+                    self.contracts_loaded,
                     self.filter_contracts_addresses,
                     self.block_info,
                     'TP_{0}'.format(i))
@@ -238,6 +258,7 @@ class ScanLogsTransactions:
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
+                    self.contracts_loaded,
                     self.filter_contracts_addresses,
                     self.block_info,
                     'CA_{0}'.format(i))
@@ -249,6 +270,7 @@ class ScanLogsTransactions:
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
+                    self.contracts_loaded,
                     self.filter_contracts_addresses,
                     self.block_info,
                     'TG')
@@ -258,11 +280,13 @@ class ScanLogsTransactions:
             "NewBitcoinTransfer": EventFastBtcBridgeNewBitcoinTransfer(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "BitcoinTransferStatusUpdated": EventFastBtcBridgeBitcoinTransferStatusUpdated(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info)
         }
@@ -292,22 +316,22 @@ class ScanLogsTransactions:
         if raw_tx["status"] == 0:
             # reverted by EVM
 
-            collection_tx = self.connection_helper.mongo_collection('Transaction')
+            collection_tx = self.connection_helper.mongo_collection('operations')
 
             d_tx = OrderedDict()
             d_tx["hash"] = raw_tx["hash"]
             d_tx["blockNumber"] = raw_tx["blockNumber"]
             d_tx["address"] = raw_tx["from"]
-            d_tx["event"] = 'ERROR'
+            d_tx["operation"] = 'ERROR'
             d_tx["gas"] = raw_tx["gas"]
             d_tx["gasPrice"] = str(raw_tx["gasPrice"])
-            d_tx["confirmations"] = self.connection_helper.connection_manager.block_number - raw_tx['blockNumber']
+            #d_tx["confirmations"] = self.connection_helper.connection_manager.block_number - raw_tx['blockNumber']
             d_tx["timestamp"] = raw_tx["timestamp"]
             d_tx["createdAt"] = raw_tx["createdAt"]
             d_tx["lastUpdatedAt"] = datetime.datetime.now()
 
             post_id = collection_tx.find_one_and_update(
-                {"transactionHash": d_tx['hash'],
+                {"hash": d_tx['hash'],
                  "event": d_tx["event"]},
                 {"$set": d_tx},
                 upsert=True)
@@ -368,59 +392,59 @@ class ScanLogsTransactions:
         duration = time.time() - start_time
         log.info("[2. Scan Events Txs] Processed: [{0}] Done! [{1} seconds]".format(count, duration))
 
-    def scan_events_not_processed_txs(self, task=None):
-        """ Trying to reindex when there is a problem with events"""
-
-        start_time = time.time()
-
-        collection_transactions = self.connection_helper.mongo_collection('Transaction')
-
-        collection_raw_transactions = self.connection_helper.mongo_collection('raw_transactions')
-
-        collection_moc_indexer = self.connection_helper.mongo_collection('moc_indexer')
-        moc_index = collection_moc_indexer.find_one(sort=[("updatedAt", -1)])
-
-        # we need to query tx with processLogs=None and in the last 24hs
-        only_last_tx = datetime.datetime.now() - datetime.timedelta(minutes=1440)
-        txs = collection_transactions.find({
-            "processLogs": None,
-            "createdAt": {"$gte": only_last_tx}}, sort=[("createdAt", 1)])
-
-        count = 0
-        if txs:
-            for tx in txs:
-                # no process when no status
-                if 'status' not in tx:
-                    continue
-
-                # only status confirmed and confirming
-                if tx["status"] not in ["confirmed", "confirming"]:
-                    continue
-
-                raw_tx = collection_raw_transactions.find_one({"hash": tx["transactionHash"]})
-
-                if not raw_tx:
-                    log.info("[8. Scan Blocks not processed] Not exist RAW Tx for hash: {0}".format(tx["transactionHash"]))
-                    continue
-
-                dt_older_than = moc_index["last_block_ts"] - datetime.timedelta(minutes=5)
-                if tx["createdAt"] >= dt_older_than:
-                    continue
-
-                log.info("[8. Scan Blocks not processed] Reindexing with hash: {0}".format(tx["transactionHash"]))
-
-                # update block information
-                self.update_info_last_block()
-
-                count += 1
-                self.process_logs(raw_tx)
-
-        duration = time.time() - start_time
-        log.info("[8. Scan Blocks not processed] Done! Processed: [{0}] [{1} seconds]".format(count, duration))
+    # def scan_events_not_processed_txs(self, task=None):
+    #     """ Trying to reindex when there is a problem with events"""
+    #
+    #     start_time = time.time()
+    #
+    #     collection_transactions = self.connection_helper.mongo_collection('operations')
+    #
+    #     collection_raw_transactions = self.connection_helper.mongo_collection('raw_transactions')
+    #
+    #     collection_moc_indexer = self.connection_helper.mongo_collection('moc_indexer')
+    #     moc_index = collection_moc_indexer.find_one(sort=[("updatedAt", -1)])
+    #
+    #     # we need to query tx with processLogs=None and in the last 24hs
+    #     only_last_tx = datetime.datetime.now() - datetime.timedelta(minutes=1440)
+    #     txs = collection_transactions.find({
+    #         "processLogs": None,
+    #         "createdAt": {"$gte": only_last_tx}}, sort=[("createdAt", 1)])
+    #
+    #     count = 0
+    #     if txs:
+    #         for tx in txs:
+    #             # no process when no status
+    #             if 'status' not in tx:
+    #                 continue
+    #
+    #             # only status confirmed and confirming
+    #             if tx["status"] not in ["confirmed", "confirming"]:
+    #                 continue
+    #
+    #             raw_tx = collection_raw_transactions.find_one({"hash": tx["transactionHash"]})
+    #
+    #             if not raw_tx:
+    #                 log.info("[8. Scan Blocks not processed] Not exist RAW Tx for hash: {0}".format(tx["transactionHash"]))
+    #                 continue
+    #
+    #             dt_older_than = moc_index["last_block_ts"] - datetime.timedelta(minutes=5)
+    #             if tx["createdAt"] >= dt_older_than:
+    #                 continue
+    #
+    #             log.info("[8. Scan Blocks not processed] Reindexing with hash: {0}".format(tx["transactionHash"]))
+    #
+    #             # update block information
+    #             self.update_info_last_block()
+    #
+    #             count += 1
+    #             self.process_logs(raw_tx)
+    #
+    #     duration = time.time() - start_time
+    #     log.info("[8. Scan Blocks not processed] Done! Processed: [{0}] [{1} seconds]".format(count, duration))
 
     def on_task(self, task=None):
         self.scan_events_txs(task=task)
 
-    def on_task_not_processed(self, task=None):
-        self.scan_events_not_processed_txs(task=task)
+    # def on_task_not_processed(self, task=None):
+    #     self.scan_events_not_processed_txs(task=task)
 

@@ -54,7 +54,7 @@ class ScanTxStatus:
     def scan_transaction_status_block(self, block_height, block_height_ts):
 
         web3 = self.connection_helper.connection_manager.web3
-        collection_tx = self.connection_helper.mongo_collection('Transaction')
+        collection_tx = self.connection_helper.mongo_collection('operations')
         seconds_not_in_chain_error = self.options['scan_tx_status']['seconds_not_in_chain_error']
 
         # Get confirming tx and check for confirming, confirmed or failed
@@ -62,7 +62,7 @@ class ScanTxStatus:
         for tx_pending in tx_pendings:
 
             try:
-                tx_receipt = web3.eth.get_transaction_receipt(tx_pending['transactionHash'])
+                tx_receipt = web3.eth.get_transaction_receipt(tx_pending['hash'])
             except TransactionNotFound:
                 tx_receipt = None
 
