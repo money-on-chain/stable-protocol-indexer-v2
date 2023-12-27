@@ -211,6 +211,20 @@ class EventMocQueueOperationError(BaseEvent):
         #  1 Executed
         #  2 Confirmed > 10 blocks
 
+        # Error Code:
+        # LOW_COVERAGE: 0x79121201
+        # INSUFFICIENT_QAC_SENT: 0x0b63f1a7
+        # INSUFFICIENT_TC_TO_REDEEM: 0xa5db715d
+        # INSUFFICIENT_TP_TO_MINT: 0xc39b739f
+        # INSUFFICIENT_TP_TO_REDEEM: 0x3fe8c5eb
+        # INSUFFICIENT_QTP_SENT: 0xf4063b46
+        # QAC_NEEDED_MUST_BE_GREATER_ZERO: 0xf3e39b5d
+        # QAC_BELOW_MINIMUM: 0x54cde313
+        # QTP_BELOW_MINIMUM: 0x9cb8fd64
+        # QTC_BELOW_MINIMUM: 0xf577bef5
+        # INVALID_FLUX_CAPACITOR_OPERATION: 0x1f69fa6a
+        # TRANSFER_FAILED: 0x90b8ec18
+
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
@@ -242,17 +256,21 @@ class EventMocQueueOperationError(BaseEvent):
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["reason_"] = d_event["reason_"]
         d_oper["status"] = -1  # Queue
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
-        operation = collection.find_one({"hash": d_oper["hash"]})
+        operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
-            if operation['status'] < 1:
+            if operation['status'] >= 1:
                 # if executed don't update
-                collection.find_one_and_update(
-                    {"operId_": d_oper["operId_"]},
-                    {"$set": d_oper},
-                    upsert=True)
+                log.warning("Event :: OperationError :: Skipping writting to database is already in status 1")
+                return d_oper, parsed
+
+        collection.find_one_and_update(
+            {"operId_": d_oper["operId_"]},
+            {"$set": d_oper},
+            upsert=True)
 
         return d_oper, parsed
 
@@ -306,17 +324,21 @@ class EventMocQueueUnhandledError(BaseEvent):
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["reason_"] = d_event["reason_"]
         d_oper["status"] = -2  # Queue
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
-        operation = collection.find_one({"hash": d_oper["hash"]})
+        operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
-            if operation['status'] < 1:
+            if operation['status'] >= 1:
                 # if executed don't update
-                collection.find_one_and_update(
-                    {"operId_": d_oper["operId_"]},
-                    {"$set": d_oper},
-                    upsert=True)
+                log.warning("Event :: MocQueue_UnhandledError :: Skipping writting to database is already in status 1")
+                return d_oper, parsed
+
+        collection.find_one_and_update(
+            {"operId_": d_oper["operId_"]},
+            {"$set": d_oper},
+            upsert=True)
 
         return d_oper, parsed
 
@@ -478,15 +500,19 @@ class EventMocQueueOperationQueued(BaseEvent):
         d_oper["status"] = 0  # Queue
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
-        operation = collection.find_one({"hash": d_oper["hash"]})
+        operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
-            if operation['status'] < 1:
+            if operation['status'] >= 1:
                 # if executed don't update
-                collection.find_one_and_update(
-                    {"operId_": d_oper["operId_"]},
-                    {"$set": d_oper},
-                    upsert=True)
+                log.warning("Event :: MocQueue_OperationQueued :: Skipping writting to database is already in status 1")
+                return d_oper, parsed
+
+        collection.find_one_and_update(
+            {"operId_": d_oper["operId_"]},
+            {"$set": d_oper},
+            upsert=True)
 
         return d_oper, parsed
 
@@ -586,8 +612,9 @@ class EventMocQueueTCMinted(BaseEvent):
         gas_fee = parsed["gasUsed"] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -655,8 +682,9 @@ class EventMocQueueTCRedeemed(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -724,8 +752,9 @@ class EventMocQueueTPMinted(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -793,8 +822,9 @@ class EventMocQueueTPRedeemed(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -863,8 +893,9 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -932,8 +963,9 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -1001,8 +1033,9 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -1070,8 +1103,9 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -1139,8 +1173,9 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
-        d_event["createdAt"] = parsed["createdAt"]
-        d_event["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},

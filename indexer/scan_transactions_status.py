@@ -37,29 +37,17 @@ class ScanTxStatus:
                     confirm_blocks=self.confirm_blocks
                 )
 
-    def is_confirmed_block(self, block_height, block_height_last, block_height_last_ts):
-
-        confirm_blocks = self.options['scan_tx_status']['confirm_blocks']
-        if block_height_last - block_height > confirm_blocks:
-            status = 2
-            confirmation_time = block_height_last_ts
-        else:
-            status = 1
-            confirmation_time = None
-
-        return status, confirmation_time
-
     def scan_transaction_status_block(self, block_height, block_height_ts):
 
         web3 = self.connection_helper.connection_manager.web3
         seconds_not_in_chain_error = self.options['scan_tx_status']['seconds_not_in_chain_error']
+        confirm_blocks = self.options['scan_tx_status']['confirm_blocks']
 
         operations = self.connection_helper.mongo_collection('operations')
 
         # Get confirming tx and check for confirming, confirmed or failed
-        tx_pendings = operations.find({'status': 1})
+        tx_pendings = operations.find({"status": {"$gte": 1}, "confirmationTime": None})
         for tx_pending in tx_pendings:
-
             try:
                 tx_receipt = web3.eth.get_transaction_receipt(tx_pending['hash'])
             except TransactionNotFound:
@@ -67,29 +55,26 @@ class ScanTxStatus:
 
             if tx_receipt:
                 d_tx_up = dict()
-                if tx_receipt['status'] == 1:
-                    d_tx_up['status'], d_tx_up['confirmationTime'] = \
-                        self.is_confirmed_block(
-                            tx_receipt['blockNumber'],
-                            block_height,
-                            block_height_ts)
-                    # if d_tx_up['status'] == 1:
-                    #    # is already on confirming status
-                    #    # not write to db
-                    #    continue
-                elif tx_receipt.status == 0:
-                    d_tx_up['status'] = -3
-                    d_tx_up['confirmationTime'] = block_height_ts
-                else:
-                    continue
+                if tx_receipt.status == 0:
+                    # Revert TX
+                    d_tx_up['status'] = -4
+                    operations.find_one_and_update(
+                        {"_id": tx_pending["_id"]},
+                        {"$set": d_tx_up})
 
-                operations.find_one_and_update(
-                    {"_id": tx_pending["_id"]},
-                    {"$set": d_tx_up})
+                    log.info("[3. Scan Moc Status] Setting TX STATUS: {0} hash: {1}".format(
+                        d_tx_up['status'],
+                        tx_pending['hash']))
+                elif tx_receipt.status == 1:
+                    if tx_pending['blockNumber'] + confirm_blocks < block_height:
+                        # set confirmation time
+                        d_tx_up['confirmationTime'] = datetime.datetime.now()
 
-                log.info("[5. Scan Moc Status] Setting TX STATUS: {0} hash: {1}".format(
-                    d_tx_up['status'],
-                    tx_pending['hash']))
+                        operations.find_one_and_update(
+                            {"_id": tx_pending["_id"]},
+                            {"$set": d_tx_up})
+
+                        log.info("[3. Scan Moc Status] Confirmed operation! hash: {0}".format(tx_pending['hash']))
             else:
                 # no receipt from tx
                 # here problem with eternal confirming
@@ -100,7 +85,6 @@ class ScanTxStatus:
                         d_tx_up = dict()
                         d_tx_up['status'] = -3
                         d_tx_up['errorCode'] = 'staleTransaction'
-                        d_tx_up['confirmationTime'] = block_height_ts
 
                         operations.find_one_and_update(
                             {"_id": tx_pending["_id"]},
