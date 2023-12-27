@@ -1,4 +1,4 @@
-
+from pymongo import ASCENDING, DESCENDING
 from .base.main import ConnectionHelperMongo
 from .base.token import ERC20Token
 from .tasks_manager import TasksManager
@@ -107,12 +107,24 @@ class StableIndexerTasks(TasksManager):
             else:
                 raise Exception("Filter address not recognize!")
 
+    def create_mongo_index(self):
+
+        # Operations collection
+        index_map = [('operId_', DESCENDING)]
+        self.connection_helper.create_index('operations', index_map, unique=False)
+
+        index_map = [('createdAt', DESCENDING)]
+        self.connection_helper.create_index('operations', index_map, unique=False)
+
     def schedule_tasks(self):
 
         log.info("Starting adding indexer tasks...")
 
         # set max workers
         self.max_workers = 1
+
+        log.info("Creating mongo collection index...")
+        self.create_mongo_index()
 
         # 1. Scan Raw Transactions
         if 'scan_raw_transactions' in self.config['tasks']:

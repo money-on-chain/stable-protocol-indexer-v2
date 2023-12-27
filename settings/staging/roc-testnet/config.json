@@ -20,14 +20,14 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 4488750,
+    "from_block": 4636104,
     "to_block": 0,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 4488750,
+    "from_block": 4636104,
     "to_block": 0,
     "max_blocks_to_process": 100
   },
@@ -37,9 +37,10 @@
   },
   "addresses": {
     "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "Moc": "0x02fd24648BcD6283216bc0C9E5c97a7FE9fA9dc2",
-    "TC": "0x4E8724016eC482f103cf5A300728A7c53759DAb0",
-    "TP": ["0x573CEe6119b312EFDEA1BC7df65E55D1D2E26bfC"],
+    "Moc": "0xCe50D6b6d678e2814F3939E82C8d9226473F4C9d",
+    "MocQueue": "0x9e8959589438c4ab1DB54829F9b51C6F6e6D1b39",
+    "TC": "0xE5358572Ff8309160aCEcbA46595628f4944bFa2",
+    "TP": ["0xDAcE171d5B7654A9F2a0D8cb4E98628608388bdE"],
     "CA": ["0x19F64674D8A5B4E652319F5e239eFd3bc969A1fE"],
     "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A"
   }

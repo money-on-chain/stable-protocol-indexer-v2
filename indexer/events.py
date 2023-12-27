@@ -1,5 +1,7 @@
 import datetime
 from collections import OrderedDict
+
+from eth_typing import HexStr
 from web3 import Web3
 
 from .logger import log
@@ -7,6 +9,15 @@ from .logger import log
 
 def sanitize_address(address):
     return Web3.to_checksum_address(address.replace("0x000000000000000000000000", "0x"))
+
+
+def oper_id_to_int(oper_id):
+
+    if str(oper_id).startswith("0x"):
+        return Web3.to_int(hexstr=HexStr(oper_id))
+        #return int(oper_id.split('0x')[1])
+    else:
+        return int(oper_id)
 
 
 class BaseEvent:
@@ -43,19 +54,19 @@ class EventMocLiqTPRedeemed(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["tp_"] = sanitize_address(parsed["tp_"]).lower()
         d_event["sender_"] = sanitize_address(parsed["sender_"]).lower()
         d_event["recipient_"] = sanitize_address(parsed["recipient_"]).lower()
-        d_event["qTP_"] = parsed_receipt["qTP_"]
-        d_event["qAC_"] = parsed_receipt["qAC_"]
+        d_event["qTP_"] = parsed["qTP_"]
+        d_event["qAC_"] = parsed["qAC_"]
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: Moc_LiqTPRedeemed :: qTP: {0} qAC: {1}".format(d_event["qTP_"], d_event["qAC_"]))
         log.info(d_event)
@@ -76,16 +87,16 @@ class EventMocSuccessFeeDistributed(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
-        d_event["mocGain_"] = parsed_receipt["mocGain_"]
-        d_event["tpGain_"] = parsed_receipt["tpGain_"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["mocGain_"] = parsed["mocGain_"]
+        d_event["tpGain_"] = parsed["tpGain_"]
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: Success Fee Distributed ")
         log.info(d_event)
@@ -106,14 +117,14 @@ class EventMocSettlementExecuted(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: Settlement Executed ")
         log.info(d_event)
@@ -134,15 +145,15 @@ class EventMocTCInterestPayment(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
-        d_event["interestAmount_"] = parsed_receipt["interestAmount_"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["interestAmount_"] = parsed["interestAmount_"]
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: TC Interest Payment :: Amount: {0} ".format(d_event["interestAmount_"]))
         log.info(d_event)
@@ -163,17 +174,17 @@ class EventMocTPemaUpdated(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
-        d_event["i_"] = parsed_receipt["i_"]
-        d_event["oldTPema_"] = parsed_receipt["oldTPema_"]
-        d_event["newTPema_"] = parsed_receipt["newTPema_"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["i_"] = int(parsed["i_"])
+        d_event["oldTPema_"] = parsed["oldTPema_"]
+        d_event["newTPema_"] = parsed["newTPema_"]
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: TP Ema Updated :: i_: {0} oldTPema_: {1} newTPema_: {2}".format(d_event["i_"], d_event["oldTPema_"], d_event["newTPema_"]))
         log.info(d_event)
@@ -201,17 +212,17 @@ class EventMocQueueOperationError(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
-        d_event["operId_"] = parsed_receipt["operId_"]
-        d_event["errorCode_"] = parsed_receipt["errorCode_"]
-        d_event["msg_"] = parsed_receipt["msg_"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["errorCode_"] = int(parsed["errorCode_"])
+        d_event["msg_"] = parsed["msg_"]
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: OperationError :: operId_: {0}".format(d_event["operId_"]))
         log.info(d_event)
@@ -220,23 +231,23 @@ class EventMocQueueOperationError(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
-        d_oper["operId_"] = d_event["operId_"]
+        d_oper["operId_"] = oper_id_to_int(d_event["operId_"])
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["reason_"] = d_event["reason_"]
         d_oper["status"] = -1  # Queue
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
         return d_oper, parsed
 
@@ -260,16 +271,16 @@ class EventMocQueueUnhandledError(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
-        d_event["operId_"] = parsed_receipt["operId_"]
-        d_event["reason_"] = parsed_receipt["reason_"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["reason_"] = parsed["reason_"]
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: MocQueue_UnhandledError :: operId_: {0}".format(d_event["operId_"]))
         log.info(d_event)
@@ -278,23 +289,23 @@ class EventMocQueueUnhandledError(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
-        d_oper["operId_"] = d_event["operId_"]
+        d_oper["operId_"] = oper_id_to_int(d_event["operId_"])
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["reason_"] = d_event["reason_"]
         d_oper["status"] = -2  # Queue
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
         return d_oper, parsed
 
@@ -310,7 +321,7 @@ class EventMocQueueOperationQueued(BaseEvent):
         tx_hash = parsed['hash']
 
         # STATUS:
-        #
+        # -3 Revert
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -332,17 +343,17 @@ class EventMocQueueOperationQueued(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
-        d_event["operId_"] = parsed_receipt["operId_"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
         d_event["bucket_"] = sanitize_address(parsed["bucket_"]).lower()
-        d_event["operType_"] = parsed_receipt["operType_"]
+        d_event["operType_"] = int(parsed["operType_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         log.info("Event :: MocQueue_OperationQueued :: operId_: {0}".format(d_event["operId_"]))
         log.info(d_event)
@@ -352,112 +363,114 @@ class EventMocQueueOperationQueued(BaseEvent):
 
         operation = None
         d_params = dict()
-        if parsed_receipt["operType_"] == 'mintTC':
+        if d_event["operType_"] == 1:
             operation = 'TCMint'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTC(d_event["operId_"]).call()
-            d_params['qTC'] = raw_params['qTC']
-            d_params['qACmax'] = raw_params['qACmax']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'redeemTC':
+            d_params['qTC'] = str(raw_params[0])
+            d_params['qACmax'] = str(raw_params[1])
+            d_params['sender'] = raw_params[2]
+            d_params['recipient'] = raw_params[3]
+            d_params['vendor'] = raw_params[4]
+        elif d_event["operType_"] == 2:
             operation = 'TCRedeem'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTC(d_event["operId_"]).call()
-            d_params['qTC'] = raw_params['qTC']
-            d_params['qACmin'] = raw_params['qACmin']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'mintTP':
+            d_params['qTC'] = str(raw_params[0])
+            d_params['qACmin'] = str(raw_params[1])
+            d_params['sender'] = raw_params[2]
+            d_params['recipient'] = raw_params[3]
+            d_params['vendor'] = raw_params[4]
+        elif d_event["operType_"] == 3:
             operation = 'TPMint'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params['tp']
-            d_params['qTP'] = raw_params['qTP']
-            d_params['qACmax'] = raw_params['qACmax']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'redeemTP':
+            d_params['tp'] = raw_params[0]
+            d_params['qTP'] = str(raw_params[1])
+            d_params['qACmax'] = str(raw_params[2])
+            d_params['sender'] = raw_params[3]
+            d_params['recipient'] = raw_params[4]
+            d_params['vendor'] = raw_params[5]
+        elif d_event["operType_"] == 4:
             operation = 'TPRedeem'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params['tp']
-            d_params['qTP'] = raw_params['qTP']
-            d_params['qACmin'] = raw_params['qACmin']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'mintTCandTP':
+            d_params['tp'] = raw_params[0]
+            d_params['qTP'] = str(raw_params[1])
+            d_params['qACmin'] = str(raw_params[2])
+            d_params['sender'] = raw_params[3]
+            d_params['recipient'] = raw_params[4]
+            d_params['vendor'] = raw_params[5]
+        elif d_event["operType_"] == 5:
             operation = 'TCandTPMint'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTCandTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params['tp']
-            d_params['qTP'] = raw_params['qTP']
-            d_params['qACmax'] = raw_params['qACmax']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'redeemTCandTP':
+            d_params['tp'] = raw_params[0]
+            d_params['qTP'] = str(raw_params[1])
+            d_params['qACmax'] = str(raw_params[2])
+            d_params['sender'] = raw_params[3]
+            d_params['recipient'] = raw_params[4]
+            d_params['vendor'] = raw_params[5]
+        elif d_event["operType_"] == 6:
             operation = 'TCandTPRedeem'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTCandTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params['tp']
-            d_params['qTC'] = raw_params['qTC']
-            d_params['qTP'] = raw_params['qTP']
-            d_params['qACmin'] = raw_params['qACmin']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'swapTCforTP':
+            d_params['tp'] = raw_params[0]
+            d_params['qTC'] = str(raw_params[1])
+            d_params['qTP'] = str(raw_params[2])
+            d_params['qACmin'] = str(raw_params[3])
+            d_params['sender'] = raw_params[4]
+            d_params['recipient'] = raw_params[5]
+            d_params['vendor'] = raw_params[6]
+        elif d_event["operType_"] == 7:
             operation = 'TCSwapForTP'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTCforTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params['tp']
-            d_params['qTC'] = raw_params['qTC']
-            d_params['qTPmin'] = raw_params['qTPmin']
-            d_params['qACmax'] = raw_params['qACmax']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'swapTPforTC':
+            d_params['tp'] = raw_params[0]
+            d_params['qTC'] = str(raw_params[1])
+            d_params['qTPmin'] = str(raw_params[2])
+            d_params['qACmax'] = str(raw_params[3])
+            d_params['sender'] = raw_params[4]
+            d_params['recipient'] = raw_params[5]
+            d_params['vendor'] = raw_params[6]
+        elif d_event["operType_"] == 8:
             operation = 'TPSwapForTC'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTPforTC(d_event["operId_"]).call()
-            d_params['tp'] = raw_params['tp']
-            d_params['qTP'] = raw_params['qTP']
-            d_params['qTCmin'] = raw_params['qTCmin']
-            d_params['qACmax'] = raw_params['qACmax']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
-        elif parsed_receipt["operType_"] == 'swapTPforTP':
+            d_params['tp'] = raw_params[0]
+            d_params['qTP'] = str(raw_params[1])
+            d_params['qTCmin'] = str(raw_params[2])
+            d_params['qACmax'] = str(raw_params[3])
+            d_params['sender'] = raw_params[4]
+            d_params['recipient'] = raw_params[5]
+            d_params['vendor'] = raw_params[6]
+        elif d_event["operType_"] == 9:
             operation = 'TPSwapForTP'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTPforTP(d_event["operId_"]).call()
-            d_params['tpFrom'] = raw_params['tpFrom']
-            d_params['tpTo'] = raw_params['tpTo']
-            d_params['qTP'] = raw_params['qTP']
-            d_params['qTPmin'] = raw_params['qTPmin']
-            d_params['qACmax'] = raw_params['qACmax']
-            d_params['sender'] = raw_params['sender']
-            d_params['recipient'] = raw_params['recipient']
-            d_params['vendor'] = raw_params['vendor']
+            d_params['tpFrom'] = raw_params[0]
+            d_params['tpTo'] = raw_params[1]
+            d_params['qTP'] = str(raw_params[2])
+            d_params['qTPmin'] = str(raw_params[3])
+            d_params['qACmax'] = str(raw_params[4])
+            d_params['sender'] = raw_params[5]
+            d_params['recipient'] = raw_params[6]
+            d_params['vendor'] = raw_params[7]
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
-        d_oper["operId_"] = d_event["operId_"]
+        d_oper["operId_"] = oper_id_to_int(d_event["operId_"])
         d_params['hash'] = tx_hash
-        d_params['blockNumber'] = parsed_receipt["blockNumber"]
+        d_params['blockNumber'] = int(parsed["blockNumber"])
+        d_params["createdAt"] = parsed["createdAt"]
+        d_params["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["params"] = d_params
         d_oper["operation"] = operation
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = d_oper['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 0  # Queue
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
         return d_oper, parsed
 
@@ -482,16 +495,16 @@ class EventMocQueueOperationExecuted(BaseEvent):
 
         d_event = dict()
         d_event["hash"] = tx_hash
-        d_event["blockNumber"] = parsed["blockNumber"]
-        d_event["operId_"] = parsed_receipt["operId_"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"]) #int(parsed["operId_"].split('0x')[1])
         d_event["executor"] = sanitize_address(parsed["executor"]).lower()
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": d_event["hash"]},
             {"$set": d_event},
             upsert=True)
-        d_event["insert_id"] = insert_id
 
         log.info("Event :: MocQueue_OperationExecuted :: operId_: {0}".format(d_event["operId_"]))
         log.info(d_event)
@@ -511,7 +524,7 @@ class EventMocQueueTCMinted(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -522,14 +535,14 @@ class EventMocQueueTCMinted(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         # write to collection operations
         collection = self.connection_helper.mongo_collection('operations')
@@ -542,27 +555,26 @@ class EventMocQueueTCMinted(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCMint'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed["gasUsed"] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -579,7 +591,7 @@ class EventMocQueueTCRedeemed(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
@@ -590,14 +602,14 @@ class EventMocQueueTCRedeemed(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         # write to collection operations
         collection = self.connection_helper.mongo_collection('operations')
@@ -610,27 +622,26 @@ class EventMocQueueTCRedeemed(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCRedeem'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -647,7 +658,7 @@ class EventMocQueueTPMinted(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp"] = sanitize_address(parsed["tp"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
@@ -659,14 +670,14 @@ class EventMocQueueTPMinted(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
                         
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         collection = self.connection_helper.mongo_collection('operations')
 
@@ -678,27 +689,26 @@ class EventMocQueueTPMinted(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPMint'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -715,7 +725,7 @@ class EventMocQueueTPRedeemed(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
@@ -727,14 +737,14 @@ class EventMocQueueTPRedeemed(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         collection = self.connection_helper.mongo_collection('operations')
 
@@ -746,27 +756,26 @@ class EventMocQueueTPRedeemed(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPRedeem'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -783,7 +792,7 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tpFrom_"] = sanitize_address(parsed["tpFrom_"])
         d_event["tpTo_"] = sanitize_address(parsed["tpTo_"])
@@ -796,14 +805,14 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         collection = self.connection_helper.mongo_collection('operations')
 
@@ -815,27 +824,26 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPSwapForTP'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -852,7 +860,7 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
@@ -864,14 +872,14 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         collection = self.connection_helper.mongo_collection('operations')
 
@@ -883,27 +891,26 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPSwapForTC'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -920,7 +927,7 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
@@ -932,14 +939,14 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         collection = self.connection_helper.mongo_collection('operations')
 
@@ -951,27 +958,26 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCSwapForTP'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -987,7 +993,7 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
@@ -1000,14 +1006,14 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         collection = self.connection_helper.mongo_collection('operations')
 
@@ -1020,27 +1026,26 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCandTPRedeem'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -1056,7 +1061,7 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         tx_hash = parsed['hash']
 
         d_event = OrderedDict()
-        d_event["blockNumber"] = parsed_receipt["blockNumber"]
+        d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
@@ -1069,14 +1074,14 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         d_event["qACVendorMarkup_"] = str(parsed["qACVendorMarkup_"])
         d_event["qFeeTokenVendorMarkup_"] = str(parsed["qFeeTokenVendorMarkup_"])
         d_event["vendor_"] = sanitize_address(parsed["vendor_"])
-        d_event["operId_"] = str(parsed["operId_"])
+        d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_event},
             upsert=True)
-        d_event['insert_id'] = insert_id
 
         collection = self.connection_helper.mongo_collection('operations')
 
@@ -1088,27 +1093,26 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         #  2 Confirmed > 10 blocks
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCandTPMint'
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1  # Executed
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
-        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["event"], tx_hash))
+        log.info("Event MocQueue {0} - Tx Hash: {1}".format(d_oper["operation"], tx_hash))
 
         return d_oper
 
@@ -1140,10 +1144,10 @@ class EventTokenTransfer(BaseEvent):
         parsed = self.parse_event(parsed_receipt, decoded_event)
 
         address_from_contract = '0x0000000000000000000000000000000000000000'
-        address_not_allowed = [str.lower(address_from_contract), self.filter_contracts_addresses]
+        address_not_allowed = [str.lower(address_from_contract)] + self.filter_contracts_addresses
 
-        if sanitize_address(parsed['from']) in address_not_allowed or \
-                sanitize_address(parsed['to']) in address_not_allowed:
+        if sanitize_address(parsed['from']).lower() in address_not_allowed or \
+                sanitize_address(parsed['to']).lower() in address_not_allowed:
             # skip transfers to our contracts
             return parsed
 
@@ -1153,27 +1157,26 @@ class EventTokenTransfer(BaseEvent):
         tx_hash = parsed['hash']
 
         d_oper = OrderedDict()
-        d_oper["blockNumber"] = parsed_receipt["blockNumber"]
+        d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["operation"] = 'Transfer'
         d_oper["hash"] = tx_hash
-        d_oper["createdAt"] = parsed_receipt['createdAt']
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
-        d_oper["gasUsed"] = parsed['gasUsed']
-        d_oper["lastUpdatedAt"] = datetime.datetime.now()
-        gas_fee = parsed_receipt['gasUsed'] * Web3.from_wei(parsed_receipt["gasPrice"], 'ether')
+        d_oper["gasUsed"] = int(parsed['gasUsed'])
+        gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed['gasPrice']), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1
         d_oper["token"] = self.token_involved
         d_oper["from_"] = sanitize_address(parsed["from"]).lower()
         d_oper["to_"] = sanitize_address(parsed["to"]).lower()
         d_oper["value_"] = str(parsed["value"])
+        d_oper["createdAt"] = parsed["createdAt"]
+        d_oper["lastUpdatedAt"] = datetime.datetime.now()
 
-        insert_id = collection.find_one_and_update(
+        collection.find_one_and_update(
             {"hash": tx_hash},
             {"$set": d_oper},
             upsert=True)
-        d_oper['insert_id'] = insert_id
 
         log.info("Tx {0} - Token: [{1}] From: [{2}] To: [{3}] Value: [{4}] Tx Hash: [{5}]".format(
             'Transfer',
@@ -1212,11 +1215,10 @@ class EventFastBtcBridgeNewBitcoinTransfer(BaseEvent):
         d_tx["timestamp"] = parsed["timestamp"]
         d_tx["updated"] = parsed["timestamp"]
 
-        post_id = collection_bridge.find_one_and_update(
+        collection_bridge.find_one_and_update(
             {"transferId": d_tx["transferId"]},
             {"$set": d_tx},
             upsert=True)
-        d_tx['post_id'] = post_id
 
         log.info("EVENT::NewBitcoinTransfer::{0}".format(d_tx["transferId"]))
         log.info(d_tx)
@@ -1239,11 +1241,10 @@ class EventFastBtcBridgeBitcoinTransferStatusUpdated(BaseEvent):
         d_tx["transferId"] = str(parsed["transferId"])
         d_tx["updated"] = parsed["timestamp"]
 
-        post_id = collection_bridge.find_one_and_update(
+        collection_bridge.find_one_and_update(
             {"transferId": d_tx["transferId"]},
             {"$set": d_tx},
             upsert=False)
-        d_tx['post_id'] = post_id
 
         log.info("EVENT::BitcoinTransferStatusUpdated::{0}".format(d_tx["transferId"]))
         log.info(d_tx)

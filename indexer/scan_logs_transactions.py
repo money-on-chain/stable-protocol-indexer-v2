@@ -1,6 +1,7 @@
 import time
 import datetime
 from collections import OrderedDict
+from web3 import Web3
 
 from .logger import log
 from .events import EventMocQueueTCMinted, \
@@ -30,6 +31,7 @@ from .base.decoder import LogDecoder, UnknownEvent
 
 
 class ScanLogsTransactions:
+    precision = 10 ** 18
 
     def __init__(self,
                  options,
@@ -318,29 +320,34 @@ class ScanLogsTransactions:
 
             collection_tx = self.connection_helper.mongo_collection('operations')
 
-            d_tx = OrderedDict()
-            d_tx["hash"] = raw_tx["hash"]
-            d_tx["blockNumber"] = raw_tx["blockNumber"]
-            d_tx["address"] = raw_tx["from"]
-            d_tx["operation"] = 'ERROR'
-            d_tx["gas"] = raw_tx["gas"]
-            d_tx["gasPrice"] = str(raw_tx["gasPrice"])
-            #d_tx["confirmations"] = self.connection_helper.connection_manager.block_number - raw_tx['blockNumber']
-            d_tx["timestamp"] = raw_tx["timestamp"]
-            d_tx["createdAt"] = raw_tx["createdAt"]
-            d_tx["lastUpdatedAt"] = datetime.datetime.now()
+            d_oper = OrderedDict()
+            d_oper["blockNumber"] = raw_tx["blockNumber"]
+            d_oper["hash"] = raw_tx["hash"]
+            d_oper["operId_"] = None
+            d_params = dict()
+            d_params['hash'] = raw_tx["hash"]
+            d_params['blockNumber'] = int(raw_tx["blockNumber"])
+            d_params["createdAt"] = raw_tx["createdAt"]
+            d_params["lastUpdatedAt"] = datetime.datetime.now()
+            d_params['sender'] = raw_tx["from"]
+            d_params["recipient"] = raw_tx["from"]
+            d_oper["params"] = d_params
+            d_oper["operation"] = 'ERROR'
+            d_oper["gas"] = raw_tx["gas"]
+            d_oper["gasPrice"] = str(raw_tx["gasPrice"])
+            d_oper["gasUsed"] = int(raw_tx['gasUsed'])
+            gas_fee = d_oper['gasUsed'] * Web3.from_wei(int(raw_tx["gasPrice"]), 'ether')
+            d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
+            d_oper["status"] = -3  # Revert
+            d_oper["createdAt"] = raw_tx["createdAt"]
+            d_oper["lastUpdatedAt"] = datetime.datetime.now()
 
-            post_id = collection_tx.find_one_and_update(
-                {"hash": d_tx['hash'],
-                 "event": d_tx["event"]},
-                {"$set": d_tx},
+            collection_tx.find_one_and_update(
+                {"hash": d_oper['hash']},
+                {"$set": d_oper},
                 upsert=True)
-            d_tx['post_id'] = post_id
 
-            log.info("Tx (REVERT) {0} From: [{1}] Tx Hash: {2}".format(
-                d_tx["event"],
-                d_tx["address"],
-                raw_tx['hash'],))
+            log.info("Tx (REVERT) Tx Hash: {0}".format(raw_tx['hash']))
 
             return
 
