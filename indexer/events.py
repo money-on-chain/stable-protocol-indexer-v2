@@ -203,6 +203,8 @@ class EventMocQueueOperationError(BaseEvent):
         tx_hash = parsed['hash']
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -266,6 +268,8 @@ class EventMocQueueUnhandledError(BaseEvent):
         tx_hash = parsed['hash']
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -328,7 +332,8 @@ class EventMocQueueOperationQueued(BaseEvent):
         tx_hash = parsed['hash']
 
         # STATUS:
-        # -3 Revert
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -498,6 +503,8 @@ class EventMocQueueOperationExecuted(BaseEvent):
         tx_hash = parsed['hash']
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -559,6 +566,8 @@ class EventMocQueueTCMinted(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -626,6 +635,8 @@ class EventMocQueueTCRedeemed(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -693,6 +704,8 @@ class EventMocQueueTPMinted(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -760,6 +773,8 @@ class EventMocQueueTPRedeemed(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -828,6 +843,8 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -895,6 +912,8 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -962,6 +981,8 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue
@@ -1029,6 +1050,7 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
         # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
@@ -1097,6 +1119,8 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         collection = self.connection_helper.mongo_collection('operations')
 
         # STATUS:
+        # -4 Revert
+        # -3 Stale Transaction
         # -2 Error Unhandled
         # -1 Error
         #  0 Queue

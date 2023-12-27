@@ -338,7 +338,7 @@ class ScanLogsTransactions:
             d_oper["gasUsed"] = int(raw_tx['gasUsed'])
             gas_fee = d_oper['gasUsed'] * Web3.from_wei(int(raw_tx["gasPrice"]), 'ether')
             d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
-            d_oper["status"] = -3  # Revert
+            d_oper["status"] = -4  # Revert
             d_oper["createdAt"] = raw_tx["createdAt"]
             d_oper["lastUpdatedAt"] = datetime.datetime.now()
 
