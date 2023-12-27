@@ -11,7 +11,6 @@
     "scan_raw_transactions": {"interval":  2},
     "scan_raw_transactions_confirming": {"interval":  2},
     "scan_logs": {"interval":  2},
-    "scan_logs_not_processed": {"interval":  30},
     "scan_tx_status": {"interval":  2}
   },
   "scan_logs": {

@@ -15,7 +15,6 @@ def oper_id_to_int(oper_id):
 
     if str(oper_id).startswith("0x"):
         return Web3.to_int(hexstr=HexStr(oper_id))
-        #return int(oper_id.split('0x')[1])
     else:
         return int(oper_id)
 
@@ -244,10 +243,14 @@ class EventMocQueueOperationError(BaseEvent):
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        collection.find_one_and_update(
-            {"operId_": d_oper["operId_"]},
-            {"$set": d_oper},
-            upsert=True)
+        operation = collection.find_one({"hash": d_oper["hash"]})
+        if operation:
+            if operation['status'] < 1:
+                # if executed don't update
+                collection.find_one_and_update(
+                    {"operId_": d_oper["operId_"]},
+                    {"$set": d_oper},
+                    upsert=True)
 
         return d_oper, parsed
 
@@ -302,10 +305,14 @@ class EventMocQueueUnhandledError(BaseEvent):
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
-        collection.find_one_and_update(
-            {"operId_": d_oper["operId_"]},
-            {"$set": d_oper},
-            upsert=True)
+        operation = collection.find_one({"hash": d_oper["hash"]})
+        if operation:
+            if operation['status'] < 1:
+                # if executed don't update
+                collection.find_one_and_update(
+                    {"operId_": d_oper["operId_"]},
+                    {"$set": d_oper},
+                    upsert=True)
 
         return d_oper, parsed
 
@@ -467,10 +474,14 @@ class EventMocQueueOperationQueued(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
 
-        collection.find_one_and_update(
-            {"operId_": d_oper["operId_"]},
-            {"$set": d_oper},
-            upsert=True)
+        operation = collection.find_one({"hash": d_oper["hash"]})
+        if operation:
+            if operation['status'] < 1:
+                # if executed don't update
+                collection.find_one_and_update(
+                    {"operId_": d_oper["operId_"]},
+                    {"$set": d_oper},
+                    upsert=True)
 
         return d_oper, parsed
 

@@ -1,15 +1,17 @@
 {
   "uri": "https://public-node.testnet.rsk.co",
   "collateral": "rc20",
-  "app_project": "roc",
+  "app_project": "flipago",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "roc_v2_testnet"
+    "db": "flipago_testnet"
   },
   "debug": true,
   "tasks": {
     "scan_raw_transactions": {"interval":  2},
-    "scan_logs": {"interval":  2}
+    "scan_raw_transactions_confirming": {"interval":  2},
+    "scan_logs": {"interval":  2},
+    "scan_tx_status": {"interval":  2}
   },
   "scan_logs": {
     "confirm_blocks": 10
@@ -17,14 +19,14 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 4639714,
+    "from_block": 4639942,
     "to_block": 0,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 4639714,
+    "from_block": 4639942,
     "to_block": 0,
     "max_blocks_to_process": 100
   },
@@ -34,11 +36,11 @@
   },
   "addresses": {
     "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "Moc": "0xCe50D6b6d678e2814F3939E82C8d9226473F4C9d",
-    "MocQueue": "0x9e8959589438c4ab1DB54829F9b51C6F6e6D1b39",
-    "TC": "0xE5358572Ff8309160aCEcbA46595628f4944bFa2",
-    "TP": ["0xDAcE171d5B7654A9F2a0D8cb4E98628608388bdE"],
-    "CA": ["0x19F64674D8A5B4E652319F5e239eFd3bc969A1fE"],
+    "Moc": "0xD84ADBC460aeEA295d49346f9E223B503E89091d",
+    "MocQueue": "0xcc468F86De1C3d35b244919247F0f2b340A608CC",
+    "TC": "0x48feb376D13Fd6C9fC50673FCfEC53DFA0e1C208",
+    "TP": ["0x0AE66294941fdA20c336cfC57EEAF5C2c35cecB4", "0xC673DABC1668726473cf163242Eb15a0cdb33cE2"],
+    "CA": ["0xCB46c0ddc60D18eFEB0E586C17Af6ea36452Dae0"],
     "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A"
   }
 }

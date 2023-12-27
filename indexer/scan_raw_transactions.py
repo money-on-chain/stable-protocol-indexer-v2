@@ -130,7 +130,6 @@ def index_raw_tx(
             d_tx["input"] = str(tx_rcp['input'])
             d_tx["receipt"] = True
             d_tx["processed"] = False
-            #d_tx["gas_used"] = tx_rcp['gasUsed']
             d_tx["confirmations"] = connection_helper.connection_manager.block_number - tx_rcp['blockNumber']
             d_tx["timestamp"] = fil_txs["block_ts"]
             d_tx["logs"] = tx_rcp['logs']
@@ -138,7 +137,7 @@ def index_raw_tx(
             d_tx["createdAt"] = fil_txs["block_ts"]
             d_tx["lastUpdatedAt"] = datetime.datetime.now()
 
-            post_id = collection_raw_transactions.find_one_and_update(
+            collection_raw_transactions.find_one_and_update(
                 {"hash": str(HexBytes(tx_rcp['hash']).hex()), "blockNumber": tx_rcp['blockNumber']},
                 {"$set": d_tx},
                 upsert=True)

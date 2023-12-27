@@ -4,14 +4,13 @@
   "app_project": "flipago",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "flipago"
+    "db": "flipago_testnet"
   },
   "debug": true,
   "tasks": {
     "scan_raw_transactions": {"interval":  2},
     "scan_raw_transactions_confirming": {"interval":  2},
     "scan_logs": {"interval":  2},
-    "scan_logs_not_processed": {"interval":  30},
     "scan_tx_status": {"interval":  2}
   },
   "scan_logs": {
@@ -20,14 +19,14 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 4488750,
+    "from_block": 4639942,
     "to_block": 0,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 4488750,
+    "from_block": 4639942,
     "to_block": 0,
     "max_blocks_to_process": 100
   },
@@ -37,10 +36,10 @@
   },
   "addresses": {
     "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "Moc": "0xE481663CB5E5C41CF528d146DC221D2489Fdc451",
+    "Moc": "0xD84ADBC460aeEA295d49346f9E223B503E89091d",
     "MocQueue": "0xcc468F86De1C3d35b244919247F0f2b340A608CC",
-    "TC": "0x483B9872C20B6D04845Eb69378bED0FbbBA07bBB",
-    "TP": ["0x10091352b607f588ef85F9Ff53012F4c4322655C", "0xEF6B253529b9275d225fD06705169CD5159B9BAE"],
+    "TC": "0x48feb376D13Fd6C9fC50673FCfEC53DFA0e1C208",
+    "TP": ["0x0AE66294941fdA20c336cfC57EEAF5C2c35cecB4", "0xC673DABC1668726473cf163242Eb15a0cdb33cE2"],
     "CA": ["0xCB46c0ddc60D18eFEB0E586C17Af6ea36452Dae0"],
     "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A"
   }
