@@ -1242,6 +1242,7 @@ class EventTokenTransfer(BaseEvent):
         d_oper["value_"] = str(parsed["value"])
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
+        d_oper["confirmationTime"] = None
 
         collection.find_one_and_update(
             {"hash": tx_hash},
