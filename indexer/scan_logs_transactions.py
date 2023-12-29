@@ -1,30 +1,37 @@
 import time
 import datetime
 from collections import OrderedDict
+from web3 import Web3
 
 from .logger import log
-from .events import EventMocTCMinted, \
-    EventMocTCRedeemed, \
-    EventMocTPMinted, \
-    EventMocTPRedeemed, \
-    EventMocTPSwappedForTP, \
-    EventMocTPSwappedForTC, \
-    EventMocTCSwappedForTP, \
-    EventMocTCandTPRedeemed, \
-    EventMocTCandTPMinted, \
+from .events import EventMocQueueTCMinted, \
+    EventMocQueueTCRedeemed, \
+    EventMocQueueTPMinted, \
+    EventMocQueueTPRedeemed, \
+    EventMocQueueTPSwappedForTP, \
+    EventMocQueueTPSwappedForTC, \
+    EventMocQueueTCSwappedForTP, \
+    EventMocQueueTCandTPRedeemed, \
+    EventMocQueueTCandTPMinted, \
     EventTokenTransfer, \
     EventFastBtcBridgeNewBitcoinTransfer, \
     EventFastBtcBridgeBitcoinTransferStatusUpdated, \
-    EventMocTCMintedWithWrapper, \
-    EventMocTCRedeemedWithWrapper, \
-    EventMocTPMintedWithWrapper, \
-    EventMocTPRedeemedWithWrapper
+    EventMocQueueOperationError, \
+    EventMocQueueUnhandledError, \
+    EventMocQueueOperationQueued, \
+    EventMocQueueOperationExecuted, \
+    EventMocLiqTPRedeemed, \
+    EventMocSuccessFeeDistributed, \
+    EventMocSettlementExecuted, \
+    EventMocTCInterestPayment, \
+    EventMocTPemaUpdated
 
 
 from .base.decoder import LogDecoder, UnknownEvent
 
 
 class ScanLogsTransactions:
+    precision = 10 ** 18
 
     def __init__(self,
                  options,
@@ -60,11 +67,9 @@ class ScanLogsTransactions:
             self.contracts_loaded['Moc'].sc
         )
 
-        # Only load with collateral == bag
-        if self.options['collateral'] == "bag":
-            contracts_log_decoder[self.contracts_addresses['MocWrapper'].lower()] = LogDecoder(
-                self.contracts_loaded['MocWrapper'].sc
-            )
+        contracts_log_decoder[self.contracts_addresses['MocQueue'].lower()] = LogDecoder(
+            self.contracts_loaded['MocQueue'].sc
+        )
 
         contracts_log_decoder[self.contracts_addresses['TC'].lower()] = LogDecoder(
             self.contracts_loaded['TC'].sc
@@ -84,9 +89,9 @@ class ScanLogsTransactions:
             )
             i += 1
 
-        if 'TG' in self.options['addresses']:
-            contracts_log_decoder[self.contracts_addresses['TG'].lower()] = LogDecoder(
-                self.contracts_loaded['TG'].sc
+        if 'FeeToken' in self.options['addresses']:
+            contracts_log_decoder[self.contracts_addresses['FeeToken'].lower()] = LogDecoder(
+                self.contracts_loaded['FeeToken'].sc
             )
 
         contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
@@ -113,82 +118,124 @@ class ScanLogsTransactions:
 
         d_event = dict()
         d_event[self.contracts_addresses["Moc"].lower()] = {
-            "TCMinted": EventMocTCMinted(
+            "LiqTPRedeemed": EventMocLiqTPRedeemed(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCRedeemed": EventMocTCRedeemed(
+            "SuccessFeeDistributed": EventMocSuccessFeeDistributed(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPMinted": EventMocTPMinted(
+            "SettlementExecuted": EventMocSettlementExecuted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPRedeemed": EventMocTPRedeemed(
+            "TCInterestPayment": EventMocTCInterestPayment(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPSwappedForTP": EventMocTPSwappedForTP(
+            "TPemaUpdated": EventMocTPemaUpdated(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses["MocQueue"].lower()] = {
+            "OperationError": EventMocQueueOperationError(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TPSwappedForTC": EventMocTPSwappedForTC(
+            "UnhandledError": EventMocQueueUnhandledError(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCSwappedForTP": EventMocTCSwappedForTP(
+            "OperationQueued": EventMocQueueOperationQueued(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCandTPRedeemed": EventMocTCandTPRedeemed(
+            "OperationExecuted": EventMocQueueOperationExecuted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
-            "TCandTPMinted": EventMocTCandTPMinted(
+            "TCMinted": EventMocQueueTCMinted(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCRedeemed": EventMocQueueTCRedeemed(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPMinted": EventMocQueueTPMinted(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPRedeemed": EventMocQueueTPRedeemed(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPSwappedForTP": EventMocQueueTPSwappedForTP(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TPSwappedForTC": EventMocQueueTPSwappedForTC(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCSwappedForTP": EventMocQueueTCSwappedForTP(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCandTPRedeemed": EventMocQueueTCandTPRedeemed(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "TCandTPMinted": EventMocQueueTCandTPMinted(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
         }
-
-        # Only load with collateral == bag
-        if self.options['collateral'] == "bag":
-            d_event[self.contracts_addresses["MocWrapper"].lower()] = {
-                "TCMintedWithWrapper": EventMocTCMintedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info),
-                "TCRedeemedWithWrapper": EventMocTCRedeemedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info),
-                "TPMintedWithWrapper": EventMocTPMintedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info),
-                "TPRedeemedWithWrapper": EventMocTPRedeemedWithWrapper(
-                    self.options,
-                    self.connection_helper,
-                    self.filter_contracts_addresses,
-                    self.block_info)
-            }
 
         d_event[self.contracts_addresses["TC"].lower()] = {
             "Transfer": EventTokenTransfer(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info,
                 'TC')
@@ -200,6 +247,7 @@ class ScanLogsTransactions:
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
+                    self.contracts_loaded,
                     self.filter_contracts_addresses,
                     self.block_info,
                     'TP_{0}'.format(i))
@@ -212,31 +260,35 @@ class ScanLogsTransactions:
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
+                    self.contracts_loaded,
                     self.filter_contracts_addresses,
                     self.block_info,
                     'CA_{0}'.format(i))
             }
             i += 1
 
-        if 'TG' in self.options['addresses']:
-            d_event[self.contracts_addresses["TG"].lower()] = {
+        if 'FeeToken' in self.options['addresses']:
+            d_event[self.contracts_addresses["FeeToken"].lower()] = {
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
+                    self.contracts_loaded,
                     self.filter_contracts_addresses,
                     self.block_info,
-                    'TG')
+                    'FeeToken')
             }
 
         d_event[self.options['addresses']['FastBtcBridge'].lower()] = {
             "NewBitcoinTransfer": EventFastBtcBridgeNewBitcoinTransfer(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info),
             "BitcoinTransferStatusUpdated": EventFastBtcBridgeBitcoinTransferStatusUpdated(
                 self.options,
                 self.connection_helper,
+                self.contracts_loaded,
                 self.filter_contracts_addresses,
                 self.block_info)
         }
@@ -266,31 +318,36 @@ class ScanLogsTransactions:
         if raw_tx["status"] == 0:
             # reverted by EVM
 
-            collection_tx = self.connection_helper.mongo_collection('Transaction')
+            collection_tx = self.connection_helper.mongo_collection('operations')
 
-            d_tx = OrderedDict()
-            d_tx["hash"] = raw_tx["hash"]
-            d_tx["blockNumber"] = raw_tx["blockNumber"]
-            d_tx["address"] = raw_tx["from"]
-            d_tx["event"] = 'ERROR'
-            d_tx["gas"] = raw_tx["gas"]
-            d_tx["gasPrice"] = str(raw_tx["gasPrice"])
-            d_tx["confirmations"] = self.connection_helper.connection_manager.block_number - raw_tx['blockNumber']
-            d_tx["timestamp"] = raw_tx["timestamp"]
-            d_tx["createdAt"] = raw_tx["createdAt"]
-            d_tx["lastUpdatedAt"] = datetime.datetime.now()
+            d_oper = OrderedDict()
+            d_oper["blockNumber"] = raw_tx["blockNumber"]
+            d_oper["hash"] = raw_tx["hash"]
+            d_oper["operId_"] = None
+            d_params = dict()
+            d_params['hash'] = raw_tx["hash"]
+            d_params['blockNumber'] = int(raw_tx["blockNumber"])
+            d_params["createdAt"] = raw_tx["createdAt"]
+            d_params["lastUpdatedAt"] = datetime.datetime.now()
+            d_params['sender'] = raw_tx["from"]
+            d_params["recipient"] = raw_tx["from"]
+            d_oper["params"] = d_params
+            d_oper["operation"] = 'ERROR'
+            d_oper["gas"] = raw_tx["gas"]
+            d_oper["gasPrice"] = str(raw_tx["gasPrice"])
+            d_oper["gasUsed"] = int(raw_tx['gasUsed'])
+            gas_fee = d_oper['gasUsed'] * Web3.from_wei(int(raw_tx["gasPrice"]), 'ether')
+            d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
+            d_oper["status"] = -4  # Revert
+            d_oper["createdAt"] = raw_tx["createdAt"]
+            d_oper["lastUpdatedAt"] = datetime.datetime.now()
 
-            post_id = collection_tx.find_one_and_update(
-                {"transactionHash": d_tx['hash'],
-                 "event": d_tx["event"]},
-                {"$set": d_tx},
+            collection_tx.find_one_and_update(
+                {"hash": d_oper['hash']},
+                {"$set": d_oper},
                 upsert=True)
-            d_tx['post_id'] = post_id
 
-            log.info("Tx (REVERT) {0} From: [{1}] Tx Hash: {2}".format(
-                d_tx["event"],
-                d_tx["address"],
-                raw_tx['hash'],))
+            log.info("Tx (REVERT) Tx Hash: {0}".format(raw_tx['hash']))
 
             return
 
@@ -342,59 +399,5 @@ class ScanLogsTransactions:
         duration = time.time() - start_time
         log.info("[2. Scan Events Txs] Processed: [{0}] Done! [{1} seconds]".format(count, duration))
 
-    def scan_events_not_processed_txs(self, task=None):
-        """ Trying to reindex when there is a problem with events"""
-
-        start_time = time.time()
-
-        collection_transactions = self.connection_helper.mongo_collection('Transaction')
-
-        collection_raw_transactions = self.connection_helper.mongo_collection('raw_transactions')
-
-        collection_moc_indexer = self.connection_helper.mongo_collection('moc_indexer')
-        moc_index = collection_moc_indexer.find_one(sort=[("updatedAt", -1)])
-
-        # we need to query tx with processLogs=None and in the last 24hs
-        only_last_tx = datetime.datetime.now() - datetime.timedelta(minutes=1440)
-        txs = collection_transactions.find({
-            "processLogs": None,
-            "createdAt": {"$gte": only_last_tx}}, sort=[("createdAt", 1)])
-
-        count = 0
-        if txs:
-            for tx in txs:
-                # no process when no status
-                if 'status' not in tx:
-                    continue
-
-                # only status confirmed and confirming
-                if tx["status"] not in ["confirmed", "confirming"]:
-                    continue
-
-                raw_tx = collection_raw_transactions.find_one({"hash": tx["transactionHash"]})
-
-                if not raw_tx:
-                    log.info("[8. Scan Blocks not processed] Not exist RAW Tx for hash: {0}".format(tx["transactionHash"]))
-                    continue
-
-                dt_older_than = moc_index["last_block_ts"] - datetime.timedelta(minutes=5)
-                if tx["createdAt"] >= dt_older_than:
-                    continue
-
-                log.info("[8. Scan Blocks not processed] Reindexing with hash: {0}".format(tx["transactionHash"]))
-
-                # update block information
-                self.update_info_last_block()
-
-                count += 1
-                self.process_logs(raw_tx)
-
-        duration = time.time() - start_time
-        log.info("[8. Scan Blocks not processed] Done! Processed: [{0}] [{1} seconds]".format(count, duration))
-
     def on_task(self, task=None):
         self.scan_events_txs(task=task)
-
-    def on_task_not_processed(self, task=None):
-        self.scan_events_not_processed_txs(task=task)
-
