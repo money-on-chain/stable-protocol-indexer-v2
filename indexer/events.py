@@ -254,8 +254,9 @@ class EventMocQueueOperationError(BaseEvent):
         d_oper["gasUsed"] = int(parsed['gasUsed'])
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
-        d_oper["reason_"] = d_event["reason_"]
-        d_oper["status"] = -1  # Queue
+        d_oper["errorCode_"] = d_event["errorCode_"]
+        d_oper["msg_"] = d_event["msg_"]
+        d_oper["status"] = -1  # Error
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
@@ -323,7 +324,7 @@ class EventMocQueueUnhandledError(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed["gasPrice"]), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["reason_"] = d_event["reason_"]
-        d_oper["status"] = -2  # Queue
+        d_oper["status"] = -2  # Error
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
@@ -1236,10 +1237,16 @@ class EventTokenTransfer(BaseEvent):
         gas_fee = parsed['gasUsed'] * Web3.from_wei(int(parsed['gasPrice']), 'ether')
         d_oper["gasFeeRBTC"] = str(int(gas_fee * self.precision))
         d_oper["status"] = 1
-        d_oper["token"] = self.token_involved
-        d_oper["from_"] = sanitize_address(parsed["from"]).lower()
-        d_oper["to_"] = sanitize_address(parsed["to"]).lower()
-        d_oper["value_"] = str(parsed["value"])
+        d_params = dict()
+        d_params['hash'] = tx_hash
+        d_params['blockNumber'] = int(parsed["blockNumber"])
+        d_params["createdAt"] = parsed["createdAt"]
+        d_params["lastUpdatedAt"] = datetime.datetime.now()
+        d_params["token"] = self.token_involved
+        d_params["sender"] = sanitize_address(parsed["from"]).lower()
+        d_params["recipient"] = sanitize_address(parsed["to"]).lower()
+        d_params["amount"] = str(parsed["value"])
+        d_oper["params"] = d_params
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
@@ -1251,10 +1258,10 @@ class EventTokenTransfer(BaseEvent):
 
         log.info("Tx {0} - Token: [{1}] From: [{2}] To: [{3}] Value: [{4}] Tx Hash: [{5}]".format(
             'Transfer',
-            d_oper["token"],
-            d_oper["from_"],
-            d_oper["to_"],
-            d_oper["value_"],
+            d_params["token"],
+            d_params["sender"],
+            d_params["recipient"],
+            d_params["amount"],
             tx_hash))
 
         return d_oper, parsed
