@@ -54,7 +54,8 @@ class EventMocLiqTPRedeemed(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
-        d_event["tp_"] = sanitize_address(parsed["tp_"]).lower()
+        d_event["tp_"] = sanitize_address(parsed["tp_"])
+        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"]).lower()
         d_event["recipient_"] = sanitize_address(parsed["recipient_"]).lower()
         d_event["qTP_"] = parsed["qTP_"]
@@ -87,8 +88,8 @@ class EventMocSuccessFeeDistributed(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
-        d_event["mocGain_"] = parsed["mocGain_"]
-        d_event["tpGain_"] = parsed["tpGain_"]
+        d_event["mocGain_"] = str(parsed["mocGain_"])
+        d_event["tpGain_"] = str(parsed["tpGain_"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -145,7 +146,7 @@ class EventMocTCInterestPayment(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
-        d_event["interestAmount_"] = parsed["interestAmount_"]
+        d_event["interestAmount_"] = str(parsed["interestAmount_"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -174,9 +175,9 @@ class EventMocTPemaUpdated(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
-        d_event["i_"] = int(parsed["i_"])
-        d_event["oldTPema_"] = parsed["oldTPema_"]
-        d_event["newTPema_"] = parsed["newTPema_"]
+        d_event["i_"] = oper_id_to_int(parsed["i_"])
+        d_event["oldTPema_"] = str(parsed["oldTPema_"])
+        d_event["newTPema_"] = str(parsed["newTPema_"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -380,7 +381,7 @@ class EventMocQueueOperationQueued(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["operId_"] = oper_id_to_int(parsed["operId_"])
-        d_event["bucket_"] = sanitize_address(parsed["bucket_"]).lower()
+        d_event["bucket_"] = sanitize_address(parsed["bucket_"])
         d_event["operType_"] = int(parsed["operType_"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
@@ -403,85 +404,93 @@ class EventMocQueueOperationQueued(BaseEvent):
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTC(d_event["operId_"]).call()
             d_params['qTC'] = str(raw_params[0])
             d_params['qACmax'] = str(raw_params[1])
-            d_params['sender'] = raw_params[2]
-            d_params['recipient'] = raw_params[3]
-            d_params['vendor'] = raw_params[4]
+            d_params['sender'] = sanitize_address(raw_params[2])
+            d_params['recipient'] = sanitize_address(raw_params[3])
+            d_params['vendor'] = sanitize_address(raw_params[4])
         elif d_event["operType_"] == 2:
             operation = 'TCRedeem'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTC(d_event["operId_"]).call()
             d_params['qTC'] = str(raw_params[0])
             d_params['qACmin'] = str(raw_params[1])
-            d_params['sender'] = raw_params[2]
-            d_params['recipient'] = raw_params[3]
-            d_params['vendor'] = raw_params[4]
+            d_params['sender'] = sanitize_address(raw_params[2])
+            d_params['recipient'] = sanitize_address(raw_params[3])
+            d_params['vendor'] = sanitize_address(raw_params[4])
         elif d_event["operType_"] == 3:
             operation = 'TPMint'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params[0]
+            d_params['tp'] = sanitize_address(raw_params[0])
+            d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
             d_params['qTP'] = str(raw_params[1])
             d_params['qACmax'] = str(raw_params[2])
-            d_params['sender'] = raw_params[3]
-            d_params['recipient'] = raw_params[4]
-            d_params['vendor'] = raw_params[5]
+            d_params['sender'] = sanitize_address(raw_params[3])
+            d_params['recipient'] = sanitize_address(raw_params[4])
+            d_params['vendor'] = sanitize_address(raw_params[5])
         elif d_event["operType_"] == 4:
             operation = 'TPRedeem'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params[0]
+            d_params['tp'] = sanitize_address(raw_params[0])
+            d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
             d_params['qTP'] = str(raw_params[1])
             d_params['qACmin'] = str(raw_params[2])
-            d_params['sender'] = raw_params[3]
-            d_params['recipient'] = raw_params[4]
-            d_params['vendor'] = raw_params[5]
+            d_params['sender'] = sanitize_address(raw_params[3])
+            d_params['recipient'] = sanitize_address(raw_params[4])
+            d_params['vendor'] = sanitize_address(raw_params[5])
         elif d_event["operType_"] == 5:
             operation = 'TCandTPMint'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTCandTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params[0]
+            d_params['tp'] = sanitize_address(raw_params[0])
+            d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
             d_params['qTP'] = str(raw_params[1])
             d_params['qACmax'] = str(raw_params[2])
-            d_params['sender'] = raw_params[3]
-            d_params['recipient'] = raw_params[4]
-            d_params['vendor'] = raw_params[5]
+            d_params['sender'] = sanitize_address(raw_params[3])
+            d_params['recipient'] = sanitize_address(raw_params[4])
+            d_params['vendor'] = sanitize_address(raw_params[5])
         elif d_event["operType_"] == 6:
             operation = 'TCandTPRedeem'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTCandTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params[0]
+            d_params['tp'] = sanitize_address(raw_params[0])
+            d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
             d_params['qTC'] = str(raw_params[1])
             d_params['qTP'] = str(raw_params[2])
             d_params['qACmin'] = str(raw_params[3])
-            d_params['sender'] = raw_params[4]
-            d_params['recipient'] = raw_params[5]
-            d_params['vendor'] = raw_params[6]
+            d_params['sender'] = sanitize_address(raw_params[4])
+            d_params['recipient'] = sanitize_address(raw_params[5])
+            d_params['vendor'] = sanitize_address(raw_params[6])
         elif d_event["operType_"] == 7:
             operation = 'TCSwapForTP'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTCforTP(d_event["operId_"]).call()
-            d_params['tp'] = raw_params[0]
+            d_params['tp'] = sanitize_address(raw_params[0])
+            d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
             d_params['qTC'] = str(raw_params[1])
             d_params['qTPmin'] = str(raw_params[2])
             d_params['qACmax'] = str(raw_params[3])
-            d_params['sender'] = raw_params[4]
-            d_params['recipient'] = raw_params[5]
-            d_params['vendor'] = raw_params[6]
+            d_params['sender'] = sanitize_address(raw_params[4])
+            d_params['recipient'] = sanitize_address(raw_params[5])
+            d_params['vendor'] = sanitize_address(raw_params[6])
         elif d_event["operType_"] == 8:
             operation = 'TPSwapForTC'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTPforTC(d_event["operId_"]).call()
-            d_params['tp'] = raw_params[0]
+            d_params['tp'] = sanitize_address(raw_params[0])
+            d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
             d_params['qTP'] = str(raw_params[1])
             d_params['qTCmin'] = str(raw_params[2])
             d_params['qACmax'] = str(raw_params[3])
-            d_params['sender'] = raw_params[4]
-            d_params['recipient'] = raw_params[5]
-            d_params['vendor'] = raw_params[6]
+            d_params['sender'] = sanitize_address(raw_params[4])
+            d_params['recipient'] = sanitize_address(raw_params[5])
+            d_params['vendor'] = sanitize_address(raw_params[6])
         elif d_event["operType_"] == 9:
             operation = 'TPSwapForTP'
             raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTPforTP(d_event["operId_"]).call()
-            d_params['tpFrom'] = raw_params[0]
-            d_params['tpTo'] = raw_params[1]
+            d_params['tpFrom'] = sanitize_address(raw_params[0])
+            d_params['tpFromIndex'] = self.options["addresses"]["TP"].index(d_params['tpFrom'])
+            d_params['tpTo'] = sanitize_address(raw_params[1])
+            d_params['tpToIndex'] = self.options["addresses"]["TP"].index(d_params['tpTo'])
             d_params['qTP'] = str(raw_params[2])
             d_params['qTPmin'] = str(raw_params[3])
             d_params['qACmax'] = str(raw_params[4])
-            d_params['sender'] = raw_params[5]
-            d_params['recipient'] = raw_params[6]
-            d_params['vendor'] = raw_params[7]
+            d_params['sender'] = sanitize_address(raw_params[5])
+            d_params['recipient'] = sanitize_address(raw_params[6])
+            d_params['vendor'] = sanitize_address(raw_params[7])
 
         d_oper = OrderedDict()
         d_oper["blockNumber"] = int(parsed["blockNumber"])
@@ -542,7 +551,7 @@ class EventMocQueueOperationExecuted(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["operId_"] = oper_id_to_int(parsed["operId_"]) #int(parsed["operId_"].split('0x')[1])
-        d_event["executor"] = sanitize_address(parsed["executor"]).lower()
+        d_event["executor"] = sanitize_address(parsed["executor"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -712,6 +721,7 @@ class EventMocQueueTPMinted(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp"] = sanitize_address(parsed["tp"])
+        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTP_"] = str(parsed["qTP_"])
@@ -782,6 +792,7 @@ class EventMocQueueTPRedeemed(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
+        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTP_"] = str(parsed["qTP_"])
@@ -852,7 +863,9 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tpFrom_"] = sanitize_address(parsed["tpFrom_"])
+        d_event['tpFromIndex_'] = self.options["addresses"]["TP"].index(d_event["tpFrom_"])
         d_event["tpTo_"] = sanitize_address(parsed["tpTo_"])
+        d_event['tpToIndex_'] = self.options["addresses"]["TP"].index(d_event["tpTo_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTPfrom_"] = str(parsed["qTPfrom_"])
@@ -923,6 +936,7 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
+        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -993,6 +1007,7 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
+        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1062,6 +1077,7 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
+        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1132,6 +1148,7 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["tp_"] = sanitize_address(parsed["tp_"])
+        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1243,8 +1260,8 @@ class EventTokenTransfer(BaseEvent):
         d_params["createdAt"] = parsed["createdAt"]
         d_params["lastUpdatedAt"] = datetime.datetime.now()
         d_params["token"] = self.token_involved
-        d_params["sender"] = sanitize_address(parsed["from"]).lower()
-        d_params["recipient"] = sanitize_address(parsed["to"]).lower()
+        d_params["sender"] = sanitize_address(parsed["from"])
+        d_params["recipient"] = sanitize_address(parsed["to"])
         d_params["amount"] = str(parsed["value"])
         d_oper["params"] = d_params
         d_oper["createdAt"] = parsed["createdAt"]
