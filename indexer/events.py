@@ -261,6 +261,7 @@ class EventMocQueueOperationError(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
@@ -329,6 +330,7 @@ class EventMocQueueUnhandledError(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
@@ -511,6 +513,7 @@ class EventMocQueueOperationQueued(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
@@ -625,6 +628,7 @@ class EventMocQueueTCMinted(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -695,6 +699,7 @@ class EventMocQueueTCRedeemed(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -766,6 +771,7 @@ class EventMocQueueTPMinted(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -837,6 +843,7 @@ class EventMocQueueTPRedeemed(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -910,6 +917,7 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -981,6 +989,7 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -1052,6 +1061,7 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -1123,6 +1133,7 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -1194,6 +1205,7 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"operId_": d_oper["operId_"]},
@@ -1267,6 +1279,7 @@ class EventTokenTransfer(BaseEvent):
         d_oper["createdAt"] = parsed["createdAt"]
         d_oper["lastUpdatedAt"] = datetime.datetime.now()
         d_oper["confirmationTime"] = None
+        d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
         collection.find_one_and_update(
             {"hash": tx_hash},
