@@ -8,6 +8,10 @@ from .logger import log
 
 
 def sanitize_address(address):
+    # not allow empty addresses
+    if address == "0x0000000000000000000000000000000000000000":
+        return None
+
     return Web3.to_checksum_address(address.replace("0x000000000000000000000000", "0x"))
 
 
