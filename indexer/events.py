@@ -234,7 +234,7 @@ class EventMocQueueOperationError(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["operId_"] = oper_id_to_int(parsed["operId_"])
-        d_event["errorCode_"] = int(parsed["errorCode_"])
+        d_event["errorCode_"] = parsed["errorCode_"]
         d_event["msg_"] = parsed["msg_"]
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
