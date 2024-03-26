@@ -1,0 +1,46 @@
+{
+  "uri": "https://public-node.testnet.rsk.co",
+  "collateral": "rc20",
+  "app_project": "roc",
+  "mongo": {
+    "uri": "mongodb://localhost:27017/",
+    "db": "roc_v2_alpha_testnet"
+  },
+  "debug": true,
+  "tasks": {
+    "scan_raw_transactions": {"interval":  2},
+    "scan_raw_transactions_confirming": {"interval":  2},
+    "scan_logs": {"interval":  2},
+    "scan_tx_status": {"interval":  2}
+  },
+  "scan_logs": {
+    "confirm_blocks": 10
+  },
+  "scan_raw_transactions": {
+    "confirm_blocks": 10,
+    "blocks_recession": 1,
+    "from_block": 4862257,
+    "to_block": 0,
+    "max_blocks_to_process": 100
+  },
+  "scan_raw_transactions_confirming": {
+    "confirm_blocks": 20,
+    "blocks_recession": 1,
+    "from_block": 4862257,
+    "to_block": 0,
+    "max_blocks_to_process": 100
+  },
+  "scan_tx_status": {
+    "seconds_not_in_chain_error": 600,
+    "confirm_blocks": 10
+  },
+  "addresses": {
+    "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
+    "Moc": "0x16F68976cDF62B911509921418dAaA95e686ca65",
+    "MocQueue": "0x96F35d9Bb84a96AfD008D887Cf07dC7425505413",
+    "TC": "0xb7A642a7aE110328195d3C81ecDC056c6EC35831",
+    "TP": ["0xC5a750bEd3C0B943fdC3124Cef596969eB7081d1"],
+    "CA": ["0x19F64674D8A5B4E652319F5e239eFd3bc969A1fE"],
+    "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A"
+  }
+}
