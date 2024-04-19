@@ -1,7 +1,7 @@
 {
   "uri": "https://public-node.testnet.rsk.co",
   "collateral": "rc20",
-  "app_project": "flipago",
+  "app_project": "flipmoney",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
     "db": "flipago_testnet"
