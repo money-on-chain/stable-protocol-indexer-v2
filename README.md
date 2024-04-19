@@ -45,7 +45,7 @@ Select settings from settings/ and copy to ./config.json also change url, db uri
 Build, change path to correct environment
 
 ```
-docker build -t stable_protocol_indexer -f Dockerfile --build-arg CONFIG=./settings/staging/flipago-testnet.json .
+docker build -t stable_protocol_indexer -f Dockerfile --build-arg CONFIG=./settings/staging/flipmoney-testnet/config.json .
 ```
 
 Run
