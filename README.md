@@ -58,3 +58,18 @@ docker run -d \
 --env APP_CONNECTION_URI=https://public-node.testnet.rsk.co \
 stable_protocol_indexer
 ```
+
+### Contracts
+
+
+**Stable protocol core v2**
+
+*[https://github.com/money-on-chain/stable-protocol-core-v2](https://github.com/money-on-chain/stable-protocol-core-v2)*
+
+**RIF on Chain implementation v2**
+
+*[https://github.com/money-on-chain/stable-protocol-roc-v2](https://github.com/money-on-chain/stable-protocol-roc-v2)*
+
+**Flipmoney implementation v2**
+
+*[https://github.com/money-on-chain/stable-protocol-roc-v2](https://github.com/money-on-chain/stable-protocol-roc-v2)*
