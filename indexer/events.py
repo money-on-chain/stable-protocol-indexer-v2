@@ -267,11 +267,19 @@ class EventMocQueueOperationError(BaseEvent):
         d_oper["confirmationTime"] = None
         d_oper["last_block_indexed"] = int(parsed["blockNumber"])
 
+        # Issue: ROC-990: Operation limited by the flux capacitor should stay in the queue and not fail
+        # msg: Max flux capacitor operation reached
+        # Constant: MAX_FLUX_CAPACITOR_REACHED
+        if d_oper["errorCode_"] == "0x0db483ca":
+            # skip if is a problem with flux capacitor stay on the queue, so set queue status
+            log.warning("Event :: OperationError :: operId_: {0} Skipping... Fluxcapacitor limitation not failing".format(d_event["operId_"]))
+            d_oper["status"] = 0
+
         operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
             if operation['status'] >= 1:
                 # if executed don't update
-                log.warning("Event :: OperationError :: Skipping writting to database is already in status 1")
+                log.warning("Event :: OperationError :: operId_: {0} Skipping writting to database is already in status 1".format(d_event["operId_"]))
                 return d_oper, parsed
 
         collection.find_one_and_update(
