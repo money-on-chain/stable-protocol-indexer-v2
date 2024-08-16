@@ -1,0 +1,46 @@
+{
+  "uri": "https://public-node.rsk.co",
+  "collateral": "rc20",
+  "app_project": "flipmoney",
+  "mongo": {
+    "uri": "mongodb://localhost:27017/",
+    "db": "flipago_mainnet"
+  },
+  "debug": true,
+  "tasks": {
+    "scan_raw_transactions": {"interval":  2},
+    "scan_raw_transactions_confirming": {"interval":  2},
+    "scan_logs": {"interval":  2},
+    "scan_tx_status": {"interval":  2}
+  },
+  "scan_logs": {
+    "confirm_blocks": 10
+  },
+  "scan_raw_transactions": {
+    "confirm_blocks": 10,
+    "blocks_recession": 1,
+    "from_block": 6615348,
+    "to_block": 0,
+    "max_blocks_to_process": 100
+  },
+  "scan_raw_transactions_confirming": {
+    "confirm_blocks": 20,
+    "blocks_recession": 1,
+    "from_block": 6615348,
+    "to_block": 0,
+    "max_blocks_to_process": 100
+  },
+  "scan_tx_status": {
+    "seconds_not_in_chain_error": 600,
+    "confirm_blocks": 10
+  },
+  "addresses": {
+    "Multicall2": "0x8f344c3b2a02a801c24635f594c5652c8a2eb02a",
+    "Moc": "0xEC766E9BAdcdE53B01118F1D5Ba56295A62e2C6D",
+    "MocQueue": "0x87252A0135BeD925068791D8ca1293C89505Ff61",
+    "TC": "0xd86E777Bd6A3C9e15948DE0394094f12ceF0fAe1",
+    "TP": ["0xCb60a3904D4d4f3F0F085cb934fD9C1f718D5299", "0x382c82b14a0b688Fd064F5BeF3c86CB1dBDBE78c"],
+    "CA": ["0x440CD83C160De5C96Ddb20246815eA44C7aBBCa8"],
+    "FastBtcBridge": "0x1A8E78B41bc5Ab9Ebb6996136622B9b41A601b5C"
+  }
+}
