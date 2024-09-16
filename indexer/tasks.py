@@ -1,16 +1,33 @@
 from pymongo import ASCENDING, DESCENDING
+import os
+import json
+
 from .base.main import ConnectionHelperMongo
 from .base.token import ERC20Token
 from .tasks_manager import TasksManager
 from .logger import log
-from .contracts import Multicall2, Moc, FastBtcBridge, MocQueue
+from .contracts import Multicall2, Moc, FastBtcBridge, MocQueue, \
+    OMOCDelayMachine, OMOCIncentiveV2, OMOCSupporters, OMOCVestingFactory, \
+    OMOCVotingMachine, OMOCIRegistry
 from .scan_raw_transactions import ScanRawTxs
 from .scan_logs_transactions import ScanLogsTransactions
 from .scan_transactions_status import ScanTxStatus
 
-__VERSION__ = '4.1.2'
+__VERSION__ = '4.2.0'
 
 log.info("Starting Protocol Indexer version {0}".format(__VERSION__))
+
+
+def read_omoc_json_file(filename=None):
+    """ Read Json File """
+
+    if not filename:
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'omoc.json')
+
+    with open(filename) as f:
+        options = json.load(f)
+
+    return options
 
 
 class StableIndexerTasks(TasksManager):
@@ -90,6 +107,59 @@ class StableIndexerTasks(TasksManager):
                 self.connection_helper.connection_manager,
                 contract_address=self.config['addresses']['FeeToken'])
             self.contracts_addresses['FeeToken'] = self.contracts_loaded["FeeToken"].address().lower()
+
+        # OMOC
+
+        omoc = read_omoc_json_file()
+
+        # IRegistry
+        self.contracts_loaded["IRegistry"] = OMOCIRegistry(
+            self.connection_helper.connection_manager,
+            self.config,
+            contract_address=self.config['addresses']['IRegistry'])
+        self.contracts_addresses['IRegistry'] = self.contracts_loaded["IRegistry"].address().lower()
+
+        # Getting addresses from Registry
+        self.contracts_addresses['DelayMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+            omoc.RegistryConstants.MOC_DELAY_MACHINE).call()
+        self.contracts_addresses['Supporters'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+            omoc.RegistryConstants.SUPPORTERS_ADDR).call()
+        self.contracts_addresses['VestingFactory'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+            omoc.RegistryConstants.MOC_VESTING_MACHINE).call()
+        self.contracts_addresses['VotingMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+            omoc.RegistryConstants.MOC_VOTING_MACHINE).call()
+
+        # IncentiveV2
+        self.contracts_loaded["IncentiveV2"] = OMOCIncentiveV2(
+            self.connection_helper.connection_manager,
+            self.config,
+            contract_address=self.config['addresses']['IncentiveV2'])
+        self.contracts_addresses['IncentiveV2'] = self.contracts_loaded["IncentiveV2"].address().lower()
+
+        # DelayMachine
+        self.contracts_loaded["DelayMachine"] = OMOCDelayMachine(
+            self.connection_helper.connection_manager,
+            self.config,
+            contract_address=self.contracts_addresses['DelayMachine'])
+
+        # Supporters
+        self.contracts_loaded["Supporters"] = OMOCSupporters(
+            self.connection_helper.connection_manager,
+            self.config,
+            contract_address=self.contracts_addresses['Supporters'])
+
+        # VestingFactory
+        self.contracts_loaded["VestingFactory"] = OMOCVestingFactory(
+            self.connection_helper.connection_manager,
+            self.config,
+            contract_address=self.contracts_addresses['VestingFactory'])
+
+        # VotingMachine
+        self.contracts_loaded["VotingMachine"] = OMOCVotingMachine(
+            self.connection_helper.connection_manager,
+            self.config,
+            contract_address=self.contracts_addresses['VotingMachine'])
+        self.contracts_addresses['VotingMachine'] = self.contracts_loaded["VotingMachine"].address().lower()
 
         # FastBTCBridge
         self.contracts_loaded["FastBtcBridge"] = FastBtcBridge(

@@ -1400,3 +1400,66 @@ class EventFastBtcBridgeBitcoinTransferStatusUpdated(BaseEvent):
         log.info(d_tx)
 
         return d_tx, parsed
+
+
+class EventOMOCIncentiveV2ClaimOK(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_IncentiveV2_ClaimOK')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["recipient"] = sanitize_address(parsed["recipient"]).lower()
+        d_event["origin"] = sanitize_address(parsed["origin"]).lower()
+        d_event["value"] = parsed["value"]
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: IncentiveV2_ClaimOK :: Recipient: {0} Origin: {1} Value: {2}".format(
+            d_event["recipient"], d_event["origin"], d_event["value"]))
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCVestingFactoryVestingCreated(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_VestingFactory_VestingCreated')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["vesting"] = sanitize_address(parsed["vesting"]).lower()
+        d_event["holder"] = sanitize_address(parsed["holder"]).lower()
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: VestingFactory_VestingCreated :: vesting: {0} holder: {1}".format(
+            d_event["vesting"], d_event["holder"]))
+        log.info(d_event)
+
+        return d_event, parsed

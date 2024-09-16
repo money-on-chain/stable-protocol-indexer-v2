@@ -24,7 +24,9 @@ from .events import EventMocQueueTCMinted, \
     EventMocSuccessFeeDistributed, \
     EventMocSettlementExecuted, \
     EventMocTCInterestPayment, \
-    EventMocTPemaUpdated
+    EventMocTPemaUpdated, \
+    EventOMOCIncentiveV2ClaimOK, \
+    EventOMOCVestingFactoryVestingCreated
 
 
 from .base.decoder import LogDecoder, UnknownEvent
@@ -96,6 +98,14 @@ class ScanLogsTransactions:
 
         contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
             self.contracts_loaded['FastBtcBridge'].sc
+        )
+
+        contracts_log_decoder[self.options['addresses']['IncentiveV2'].lower()] = LogDecoder(
+            self.contracts_loaded['IncentiveV2'].sc
+        )
+
+        contracts_log_decoder[self.options['addresses']['VestingFactory'].lower()] = LogDecoder(
+            self.contracts_loaded['VestingFactory'].sc
         )
 
         return contracts_log_decoder
@@ -286,6 +296,24 @@ class ScanLogsTransactions:
                 self.filter_contracts_addresses,
                 self.block_info),
             "BitcoinTransferStatusUpdated": EventFastBtcBridgeBitcoinTransferStatusUpdated(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.options['addresses']['IncentiveV2'].lower()] = {
+            "ClaimOK": EventOMOCIncentiveV2ClaimOK(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.options['addresses']['VestingFactory'].lower()] = {
+            "VestingCreated": EventOMOCVestingFactoryVestingCreated(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
