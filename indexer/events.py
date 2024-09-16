@@ -1461,3 +1461,294 @@ class EventOMOCVestingFactoryVestingCreated(BaseEvent):
         log.info(d_event)
 
         return d_event, parsed
+
+
+class EventOMOCDelayMachinePaymentCancel(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_DelayMachine_PaymentCancel')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["id"] = str(parsed["id"])
+        d_event["source"] = sanitize_address(parsed["source"]).lower()
+        d_event["destination"] = sanitize_address(parsed["destination"]).lower()
+        d_event["amount"] = str(parsed["amount"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: DelayMachine_PaymentCancel")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCDelayMachinePaymentDeposit(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_DelayMachine_PaymentDeposit')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["id"] = str(parsed["id"])
+        d_event["source"] = sanitize_address(parsed["source"]).lower()
+        d_event["destination"] = sanitize_address(parsed["destination"]).lower()
+        d_event["amount"] = str(parsed["amount"])
+        d_event["expiration"] = str(parsed["expiration"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: DelayMachine_PaymentDeposit")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCDelayMachinePaymentWithdraw(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_DelayMachine_PaymentWithdraw')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["id"] = str(parsed["id"])
+        d_event["source"] = sanitize_address(parsed["source"]).lower()
+        d_event["destination"] = sanitize_address(parsed["destination"]).lower()
+        d_event["amount"] = str(parsed["amount"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: DelayMachine_PaymentWithdraw")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCSupportersAddStake(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_Supporters_AddStake')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["user"] = sanitize_address(parsed["user"]).lower()
+        d_event["subaccount"] = sanitize_address(parsed["subaccount"]).lower()
+        d_event["sender"] = sanitize_address(parsed["sender"]).lower()
+        d_event["amount"] = str(parsed["amount"])
+        d_event["mocs"] = str(parsed["mocs"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: Supporters_AddStake")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCSupportersCancelEarnings(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_Supporters_CancelEarnings')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["earnings"] = str(parsed["earnings"])
+        d_event["start"] = str(parsed["start"])
+        d_event["end"] = str(parsed["end"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: Supporters_CancelEarnings")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCSupportersPayEarnings(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_Supporters_PayEarnings')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["earnings"] = str(parsed["earnings"])
+        d_event["start"] = str(parsed["start"])
+        d_event["end"] = str(parsed["end"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: Supporters_PayEarnings")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCSupportersWithdraw(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_Supporters_Withdraw')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["msgSender"] = sanitize_address(parsed["msgSender"]).lower()
+        d_event["subacount"] = sanitize_address(parsed["subacount"]).lower()
+        d_event["receiver"] = sanitize_address(parsed["receiver"]).lower()
+        d_event["mocs"] = str(parsed["mocs"])
+        d_event["blockNum"] = str(parsed["blockNum"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: Supporters_Withdraw")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCSupportersWithdrawStake(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_Supporters_WithdrawStake')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["user"] = sanitize_address(parsed["user"]).lower()
+        d_event["subacount"] = sanitize_address(parsed["subacount"]).lower()
+        d_event["destination"] = sanitize_address(parsed["destination"]).lower()
+        d_event["amount"] = str(parsed["amount"])
+        d_event["mocs"] = str(parsed["mocs"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: Supporters_WithdrawStake")
+        log.info(d_event)
+
+        return d_event, parsed
+
+
+class EventOMOCVotingMachineVoteEvent(BaseEvent):
+
+    def parse_event_and_save(self, parsed_receipt, decoded_event):
+
+        parsed = self.parse_event(parsed_receipt, decoded_event)
+
+        # get collection
+        collection = self.connection_helper.mongo_collection('event_VotingMachine_VoteEvent')
+
+        tx_hash = parsed['hash']
+
+        d_event = dict()
+        d_event["hash"] = tx_hash
+        d_event["blockNumber"] = int(parsed["blockNumber"])
+        d_event["user"] = sanitize_address(parsed["user"]).lower()
+        d_event["subacount"] = sanitize_address(parsed["subacount"]).lower()
+        d_event["destination"] = sanitize_address(parsed["destination"]).lower()
+        d_event["amount"] = str(parsed["amount"])
+        d_event["mocs"] = str(parsed["mocs"])
+        d_event["createdAt"] = parsed["createdAt"]
+        d_event["lastUpdatedAt"] = datetime.datetime.now()
+
+        collection.find_one_and_update(
+            {"hash": d_event["hash"]},
+            {"$set": d_event},
+            upsert=True)
+
+        log.info("Event :: VotingMachine_VoteEvent")
+        log.info(d_event)
+
+        return d_event, parsed
