@@ -1418,7 +1418,7 @@ class EventOMOCIncentiveV2ClaimOK(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["recipient"] = sanitize_address(parsed["recipient"]).lower()
         d_event["origin"] = sanitize_address(parsed["origin"]).lower()
-        d_event["value"] = parsed["value"]
+        d_event["value"] = str(parsed["value"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -1427,8 +1427,7 @@ class EventOMOCIncentiveV2ClaimOK(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: IncentiveV2_ClaimOK :: Recipient: {0} Origin: {1} Value: {2}".format(
-            d_event["recipient"], d_event["origin"], d_event["value"]))
+        log.info("Event :: IncentiveV2_ClaimOK")
         log.info(d_event)
 
         return d_event, parsed
@@ -1458,8 +1457,7 @@ class EventOMOCVestingFactoryVestingCreated(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: VestingFactory_VestingCreated :: vesting: {0} holder: {1}".format(
-            d_event["vesting"], d_event["holder"]))
+        log.info("Event :: VestingFactory_VestingCreated")
         log.info(d_event)
 
         return d_event, parsed

@@ -1,10 +1,10 @@
 {
   "uri": "https://public-node.testnet.rsk.co",
   "collateral": "rc20",
-  "app_project": "roc",
+  "app_project": "flipmoney",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "roc_v2_testnet"
+    "db": "flipmoney_testnet"
   },
   "debug": true,
   "tasks": {
@@ -19,15 +19,15 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 4862257,
-    "to_block": 0,
+    "from_block": 5528328,
+    "to_block": 5528329,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 4862257,
-    "to_block": 0,
+    "from_block": 5528328,
+    "to_block": 5528329,
     "max_blocks_to_process": 100
   },
   "scan_tx_status": {
@@ -36,13 +36,13 @@
   },
   "addresses": {
     "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "Moc": "0xa416934264515bb381E3b746f10f22D5c6f9431a",
-    "MocQueue": "0xcbfe89ABB069AE87E26d0cd84F70F6BD599A3ad9",
-    "TC": "0x23A1aA7b11e68beBE560a36beC04D1f79357f28d",
-    "TP": ["0x8dbf326e12a9fF37ED6DDF75adA548C2640A6482"],
-    "CA": ["0x19F64674D8A5B4E652319F5e239eFd3bc969A1fE"],
+    "Moc": "0x1D316199a07962A06ec59D8d10990403f0330485",
+    "MocQueue": "0x7124A89A06E02A5f0623d38fd106880A8A4FBC0c",
+    "TC": "0xa49889664Ae2c1c7e1C48EE1df22f6C7347dE15F",
+    "TP": ["0x762028b3120cdF8117DC769350f3D60C7FB7995e", "0xC47ADF3D2f8906b1DaF9BfaE985B197CD851C3A2"],
+    "CA": ["0x4dA7997A819bb46B6758B9102234c289dD2Ad3bf"],
     "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A",
-    "IRegistry": "",
-    "IncentiveV2": ""
+    "IRegistry": "0xbd13268a4a738911c638701DC059B47A3D286716",
+    "IncentiveV2": "0xE4E75DF1D35BB290d642df07dF8b0f3A5400D1e8"
   }
 }

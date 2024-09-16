@@ -100,11 +100,11 @@ class ScanLogsTransactions:
             self.contracts_loaded['FastBtcBridge'].sc
         )
 
-        contracts_log_decoder[self.options['addresses']['IncentiveV2'].lower()] = LogDecoder(
+        contracts_log_decoder[self.contracts_addresses['IncentiveV2'].lower()] = LogDecoder(
             self.contracts_loaded['IncentiveV2'].sc
         )
 
-        contracts_log_decoder[self.options['addresses']['VestingFactory'].lower()] = LogDecoder(
+        contracts_log_decoder[self.contracts_addresses['VestingFactory'].lower()] = LogDecoder(
             self.contracts_loaded['VestingFactory'].sc
         )
 
@@ -303,7 +303,7 @@ class ScanLogsTransactions:
                 self.block_info)
         }
 
-        d_event[self.options['addresses']['IncentiveV2'].lower()] = {
+        d_event[self.contracts_addresses['IncentiveV2'].lower()] = {
             "ClaimOK": EventOMOCIncentiveV2ClaimOK(
                 self.options,
                 self.connection_helper,
@@ -312,7 +312,7 @@ class ScanLogsTransactions:
                 self.block_info)
         }
 
-        d_event[self.options['addresses']['VestingFactory'].lower()] = {
+        d_event[self.contracts_addresses['VestingFactory'].lower()] = {
             "VestingCreated": EventOMOCVestingFactoryVestingCreated(
                 self.options,
                 self.connection_helper,
