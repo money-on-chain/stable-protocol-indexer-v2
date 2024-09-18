@@ -1513,7 +1513,7 @@ class EventOMOCDelayMachinePaymentDeposit(BaseEvent):
         d_event["source"] = sanitize_address(parsed["source"]).lower()
         d_event["destination"] = sanitize_address(parsed["destination"]).lower()
         d_event["amount"] = str(parsed["amount"])
-        d_event["expiration"] = str(parsed["expiration"])
+        d_event["expiration"] = int(parsed["expiration"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -1608,8 +1608,8 @@ class EventOMOCSupportersCancelEarnings(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["earnings"] = str(parsed["earnings"])
-        d_event["start"] = str(parsed["start"])
-        d_event["end"] = str(parsed["end"])
+        d_event["start"] = int(parsed["start"])
+        d_event["end"] = int(parsed["end"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -1639,8 +1639,8 @@ class EventOMOCSupportersPayEarnings(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["earnings"] = str(parsed["earnings"])
-        d_event["start"] = str(parsed["start"])
-        d_event["end"] = str(parsed["end"])
+        d_event["start"] = int(parsed["start"])
+        d_event["end"] = int(parsed["end"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
