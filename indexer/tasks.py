@@ -121,13 +121,15 @@ class StableIndexerTasks(TasksManager):
 
         # Getting addresses from Registry
         self.contracts_addresses['DelayMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['MOC_DELAY_MACHINE']).call()
+            omoc['RegistryConstants']['MOC_DELAY_MACHINE']).call().lower()
         self.contracts_addresses['Supporters'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['SUPPORTERS_ADDR']).call()
+            omoc['RegistryConstants']['SUPPORTERS_ADDR']).call().lower()
         self.contracts_addresses['VestingFactory'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['MOC_VESTING_MACHINE']).call()
+            omoc['RegistryConstants']['MOC_VESTING_MACHINE']).call().lower()
         self.contracts_addresses['VotingMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['MOC_VOTING_MACHINE']).call()
+            omoc['RegistryConstants']['MOC_VOTING_MACHINE']).call().lower()
+        self.contracts_addresses['StakingMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+            omoc['RegistryConstants']['MOC_STAKING_MACHINE']).call().lower()
 
         # IncentiveV2
         self.contracts_loaded["IncentiveV2"] = OMOCIncentiveV2(

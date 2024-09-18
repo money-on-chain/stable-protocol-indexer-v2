@@ -14,6 +14,7 @@ LOCAL_TIMEZONE = datetime.datetime.now().astimezone().tzinfo
 def filter_transactions(transactions, filter_addresses):
     l_transactions = list()
     d_index_transactions = dict()
+
     for transaction in transactions:
         tx_to = None
         tx_from = None
@@ -304,12 +305,25 @@ class ScanRawTxs:
         self.options = options
         self.connection_helper = connection_helper
         self.filter_contracts = filter_contracts
+        self.filter_contracts_vesting = []
 
     def on_init(self):
         pass
 
+    def on_load_vesting(self):
+
+        vesting_created = self.connection_helper.mongo_collection('event_VestingFactory_VestingCreated')
+        all_vesting = vesting_created.find({})
+        l_vesting = []
+        for vesting in all_vesting:
+            l_vesting.append(vesting['vesting'].lower())
+
+        self.filter_contracts_vesting = l_vesting
+
     def on_task(self, task=None):
-        scan_raw_txs(self.options, self.connection_helper, self.filter_contracts, task=task)
+        self.on_load_vesting()
+        scan_raw_txs(self.options, self.connection_helper, self.filter_contracts + self.filter_contracts_vesting, task=task)
 
     def on_task_confirming(self, task=None):
-        scan_raw_txs_confirming(self.options, self.connection_helper, self.filter_contracts, task=task)
+        self.on_load_vesting()
+        scan_raw_txs_confirming(self.options, self.connection_helper, self.filter_contracts + self.filter_contracts_vesting, task=task)

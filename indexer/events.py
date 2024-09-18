@@ -1477,7 +1477,7 @@ class EventOMOCDelayMachinePaymentCancel(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
-        d_event["id"] = str(parsed["id"])
+        d_event["id"] = oper_id_to_int(parsed["id"])
         d_event["source"] = sanitize_address(parsed["source"]).lower()
         d_event["destination"] = sanitize_address(parsed["destination"]).lower()
         d_event["amount"] = str(parsed["amount"])
@@ -1509,7 +1509,7 @@ class EventOMOCDelayMachinePaymentDeposit(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
-        d_event["id"] = str(parsed["id"])
+        d_event["id"] = oper_id_to_int(parsed["id"])
         d_event["source"] = sanitize_address(parsed["source"]).lower()
         d_event["destination"] = sanitize_address(parsed["destination"]).lower()
         d_event["amount"] = str(parsed["amount"])
@@ -1542,7 +1542,7 @@ class EventOMOCDelayMachinePaymentWithdraw(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
-        d_event["id"] = str(parsed["id"])
+        d_event["id"] = oper_id_to_int(parsed["id"])
         d_event["source"] = sanitize_address(parsed["source"]).lower()
         d_event["destination"] = sanitize_address(parsed["destination"]).lower()
         d_event["amount"] = str(parsed["amount"])
@@ -1670,10 +1670,10 @@ class EventOMOCSupportersWithdraw(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["msgSender"] = sanitize_address(parsed["msgSender"]).lower()
-        d_event["subacount"] = sanitize_address(parsed["subacount"]).lower()
+        d_event["subaccount"] = sanitize_address(parsed["subaccount"]).lower()
         d_event["receiver"] = sanitize_address(parsed["receiver"]).lower()
         d_event["mocs"] = str(parsed["mocs"])
-        d_event["blockNum"] = str(parsed["blockNum"])
+        d_event["blockNum"] = int(parsed["blockNumber"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
 
@@ -1703,7 +1703,7 @@ class EventOMOCSupportersWithdrawStake(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["user"] = sanitize_address(parsed["user"]).lower()
-        d_event["subacount"] = sanitize_address(parsed["subacount"]).lower()
+        d_event["subaccount"] = sanitize_address(parsed["subaccount"]).lower()
         d_event["destination"] = sanitize_address(parsed["destination"]).lower()
         d_event["amount"] = str(parsed["amount"])
         d_event["mocs"] = str(parsed["mocs"])
@@ -1736,7 +1736,7 @@ class EventOMOCVotingMachineVoteEvent(BaseEvent):
         d_event["hash"] = tx_hash
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["user"] = sanitize_address(parsed["user"]).lower()
-        d_event["subacount"] = sanitize_address(parsed["subacount"]).lower()
+        d_event["subaccount"] = sanitize_address(parsed["subaccount"]).lower()
         d_event["destination"] = sanitize_address(parsed["destination"]).lower()
         d_event["amount"] = str(parsed["amount"])
         d_event["mocs"] = str(parsed["mocs"])
