@@ -19,8 +19,8 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 5531724,
-    "to_block": 5531725,
+    "from_block": 5485245,
+    "to_block": 5485246,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
