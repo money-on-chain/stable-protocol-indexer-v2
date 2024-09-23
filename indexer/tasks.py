@@ -13,7 +13,7 @@ from .scan_raw_transactions import ScanRawTxs
 from .scan_logs_transactions import ScanLogsTransactions
 from .scan_transactions_status import ScanTxStatus
 
-__VERSION__ = '4.2.0'
+__VERSION__ = '4.2.1'
 
 log.info("Starting Protocol Indexer version {0}".format(__VERSION__))
 
@@ -132,11 +132,12 @@ class StableIndexerTasks(TasksManager):
             omoc['RegistryConstants']['MOC_STAKING_MACHINE']).call().lower()
 
         # IncentiveV2
-        self.contracts_loaded["IncentiveV2"] = OMOCIncentiveV2(
-            self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.config['addresses']['IncentiveV2'])
-        self.contracts_addresses['IncentiveV2'] = self.contracts_loaded["IncentiveV2"].address().lower()
+        if self.config['addresses']['IncentiveV2']:
+            self.contracts_loaded["IncentiveV2"] = OMOCIncentiveV2(
+                self.connection_helper.connection_manager,
+                self.config,
+                contract_address=self.config['addresses']['IncentiveV2'])
+            self.contracts_addresses['IncentiveV2'] = self.contracts_loaded["IncentiveV2"].address().lower()
 
         # DelayMachine
         self.contracts_loaded["DelayMachine"] = OMOCDelayMachine(
@@ -246,6 +247,18 @@ class StableIndexerTasks(TasksManager):
                           wait=interval,
                           timeout=180,
                           task_name='4. Scan Raw Transactions Confirming')
+
+        # 5. Scan Raw Transactions History
+        if 'scan_raw_transactions_history' in self.config['tasks']:
+            log.info("Jobs add: 5. Scan Raw Transactions History")
+            interval = self.config['tasks']['scan_raw_transactions_history']['interval']
+            scan_raw_txs_history = ScanRawTxs(self.config, self.connection_helper,
+                                                 self.filter_contracts_addresses)
+            self.add_task(scan_raw_txs_history.on_task_history,
+                          args=[],
+                          wait=interval,
+                          timeout=180,
+                          task_name='5. Scan Raw Transactions History')
 
         # Set max tasks
         self.max_tasks = len(self.tasks)
