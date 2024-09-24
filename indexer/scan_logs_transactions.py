@@ -24,7 +24,18 @@ from .events import EventMocQueueTCMinted, \
     EventMocSuccessFeeDistributed, \
     EventMocSettlementExecuted, \
     EventMocTCInterestPayment, \
-    EventMocTPemaUpdated
+    EventMocTPemaUpdated, \
+    EventOMOCIncentiveV2ClaimOK, \
+    EventOMOCVestingFactoryVestingCreated, \
+    EventOMOCDelayMachinePaymentCancel, \
+    EventOMOCDelayMachinePaymentDeposit, \
+    EventOMOCDelayMachinePaymentWithdraw, \
+    EventOMOCSupportersAddStake, \
+    EventOMOCSupportersCancelEarnings, \
+    EventOMOCSupportersPayEarnings, \
+    EventOMOCSupportersWithdraw, \
+    EventOMOCSupportersWithdrawStake, \
+    EventOMOCVotingMachineVoteEvent
 
 
 from .base.decoder import LogDecoder, UnknownEvent
@@ -96,6 +107,27 @@ class ScanLogsTransactions:
 
         contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
             self.contracts_loaded['FastBtcBridge'].sc
+        )
+
+        if 'IncentiveV2' in self.contracts_loaded:
+            contracts_log_decoder[self.contracts_addresses['IncentiveV2'].lower()] = LogDecoder(
+                self.contracts_loaded['IncentiveV2'].sc
+            )
+
+        contracts_log_decoder[self.contracts_addresses['VestingFactory'].lower()] = LogDecoder(
+            self.contracts_loaded['VestingFactory'].sc
+        )
+
+        contracts_log_decoder[self.contracts_addresses['DelayMachine'].lower()] = LogDecoder(
+            self.contracts_loaded['DelayMachine'].sc
+        )
+
+        contracts_log_decoder[self.contracts_addresses['Supporters'].lower()] = LogDecoder(
+            self.contracts_loaded['Supporters'].sc
+        )
+
+        contracts_log_decoder[self.contracts_addresses['VotingMachine'].lower()] = LogDecoder(
+            self.contracts_loaded['VotingMachine'].sc
         )
 
         return contracts_log_decoder
@@ -286,6 +318,88 @@ class ScanLogsTransactions:
                 self.filter_contracts_addresses,
                 self.block_info),
             "BitcoinTransferStatusUpdated": EventFastBtcBridgeBitcoinTransferStatusUpdated(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        if 'IncentiveV2' in self.contracts_loaded:
+            d_event[self.contracts_addresses['IncentiveV2'].lower()] = {
+                "ClaimOK": EventOMOCIncentiveV2ClaimOK(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.filter_contracts_addresses,
+                    self.block_info)
+            }
+
+        d_event[self.contracts_addresses['VestingFactory'].lower()] = {
+            "VestingCreated": EventOMOCVestingFactoryVestingCreated(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses['DelayMachine'].lower()] = {
+            "PaymentCancel": EventOMOCDelayMachinePaymentCancel(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "PaymentDeposit": EventOMOCDelayMachinePaymentDeposit(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "PaymentWithdraw": EventOMOCDelayMachinePaymentWithdraw(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses['Supporters'].lower()] = {
+            "AddStake": EventOMOCSupportersAddStake(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "CancelEarnings": EventOMOCSupportersCancelEarnings(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "PayEarnings": EventOMOCSupportersPayEarnings(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "Withdraw": EventOMOCSupportersWithdraw(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "WithdrawStake": EventOMOCSupportersWithdrawStake(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses['VotingMachine'].lower()] = {
+            "VoteEvent": EventOMOCVotingMachineVoteEvent(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
