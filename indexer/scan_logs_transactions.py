@@ -455,6 +455,17 @@ class ScanLogsTransactions:
             d_oper["status"] = -4  # Revert
             d_oper["createdAt"] = raw_tx["createdAt"]
             d_oper["lastUpdatedAt"] = datetime.datetime.now()
+            d_oper['from'] = raw_tx["from"]
+            d_oper["to"] = raw_tx["to"]
+
+            try:
+                d_oper["contract"] = list(self.contracts_addresses.keys())[list(self.contracts_addresses.values()).index(d_oper["to"].lower())]
+            except KeyError:
+                d_oper["contract"] = ''
+
+            if d_oper["contract"] not in ['Moc', 'MocQueue', 'TC', 'TP', 'CA', 'FeeToken']:
+                log.info("Tx (REVERT) contract is not from Stable Protocol. Tx Hash: {0}".format(raw_tx['hash']))
+                return
 
             collection_tx.find_one_and_update(
                 {"hash": d_oper['hash']},

@@ -33,8 +33,8 @@
   },
   "scan_raw_transactions_history": {
     "blocks_recession": 0,
-    "from_block": 1319713,
-    "to_block": 1400000,
+    "from_block": 3600001,
+    "to_block": 5580000,
     "max_blocks_to_process": 100
   },
   "scan_tx_status": {
