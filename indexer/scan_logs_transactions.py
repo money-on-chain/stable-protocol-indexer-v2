@@ -460,7 +460,7 @@ class ScanLogsTransactions:
 
             try:
                 d_oper["contract"] = list(self.contracts_addresses.keys())[list(self.contracts_addresses.values()).index(d_oper["to"].lower())]
-            except KeyError:
+            except (KeyError, ValueError):
                 d_oper["contract"] = ''
 
             if d_oper["contract"] not in ['Moc', 'MocQueue', 'TC', 'TP', 'CA', 'FeeToken']:
