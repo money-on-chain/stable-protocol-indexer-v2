@@ -24,7 +24,18 @@ from .events import EventMocQueueTCMinted, \
     EventMocSuccessFeeDistributed, \
     EventMocSettlementExecuted, \
     EventMocTCInterestPayment, \
-    EventMocTPemaUpdated
+    EventMocTPemaUpdated, \
+    EventOMOCIncentiveV2ClaimOK, \
+    EventOMOCVestingFactoryVestingCreated, \
+    EventOMOCDelayMachinePaymentCancel, \
+    EventOMOCDelayMachinePaymentDeposit, \
+    EventOMOCDelayMachinePaymentWithdraw, \
+    EventOMOCSupportersAddStake, \
+    EventOMOCSupportersCancelEarnings, \
+    EventOMOCSupportersPayEarnings, \
+    EventOMOCSupportersWithdraw, \
+    EventOMOCSupportersWithdrawStake, \
+    EventOMOCVotingMachineVoteEvent
 
 
 from .base.decoder import LogDecoder, UnknownEvent
@@ -96,6 +107,27 @@ class ScanLogsTransactions:
 
         contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
             self.contracts_loaded['FastBtcBridge'].sc
+        )
+
+        if 'IncentiveV2' in self.contracts_loaded:
+            contracts_log_decoder[self.contracts_addresses['IncentiveV2'].lower()] = LogDecoder(
+                self.contracts_loaded['IncentiveV2'].sc
+            )
+
+        contracts_log_decoder[self.contracts_addresses['VestingFactory'].lower()] = LogDecoder(
+            self.contracts_loaded['VestingFactory'].sc
+        )
+
+        contracts_log_decoder[self.contracts_addresses['DelayMachine'].lower()] = LogDecoder(
+            self.contracts_loaded['DelayMachine'].sc
+        )
+
+        contracts_log_decoder[self.contracts_addresses['Supporters'].lower()] = LogDecoder(
+            self.contracts_loaded['Supporters'].sc
+        )
+
+        contracts_log_decoder[self.contracts_addresses['VotingMachine'].lower()] = LogDecoder(
+            self.contracts_loaded['VotingMachine'].sc
         )
 
         return contracts_log_decoder
@@ -293,6 +325,88 @@ class ScanLogsTransactions:
                 self.block_info)
         }
 
+        if 'IncentiveV2' in self.contracts_loaded:
+            d_event[self.contracts_addresses['IncentiveV2'].lower()] = {
+                "ClaimOK": EventOMOCIncentiveV2ClaimOK(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.filter_contracts_addresses,
+                    self.block_info)
+            }
+
+        d_event[self.contracts_addresses['VestingFactory'].lower()] = {
+            "VestingCreated": EventOMOCVestingFactoryVestingCreated(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses['DelayMachine'].lower()] = {
+            "PaymentCancel": EventOMOCDelayMachinePaymentCancel(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "PaymentDeposit": EventOMOCDelayMachinePaymentDeposit(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "PaymentWithdraw": EventOMOCDelayMachinePaymentWithdraw(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses['Supporters'].lower()] = {
+            "AddStake": EventOMOCSupportersAddStake(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "CancelEarnings": EventOMOCSupportersCancelEarnings(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "PayEarnings": EventOMOCSupportersPayEarnings(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "Withdraw": EventOMOCSupportersWithdraw(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info),
+            "WithdrawStake": EventOMOCSupportersWithdrawStake(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
+        d_event[self.contracts_addresses['VotingMachine'].lower()] = {
+            "VoteEvent": EventOMOCVotingMachineVoteEvent(
+                self.options,
+                self.connection_helper,
+                self.contracts_loaded,
+                self.filter_contracts_addresses,
+                self.block_info)
+        }
+
         return d_event
 
     def on_init(self):
@@ -341,6 +455,17 @@ class ScanLogsTransactions:
             d_oper["status"] = -4  # Revert
             d_oper["createdAt"] = raw_tx["createdAt"]
             d_oper["lastUpdatedAt"] = datetime.datetime.now()
+            d_oper['from'] = raw_tx["from"]
+            d_oper["to"] = raw_tx["to"]
+
+            try:
+                d_oper["contract"] = list(self.contracts_addresses.keys())[list(self.contracts_addresses.values()).index(d_oper["to"].lower())]
+            except (KeyError, ValueError):
+                d_oper["contract"] = ''
+
+            if d_oper["contract"] not in ['Moc', 'MocQueue', 'TC', 'TP', 'CA', 'FeeToken']:
+                log.info("Tx (REVERT) contract is not from Stable Protocol. Tx Hash: {0}".format(raw_tx['hash']))
+                return
 
             collection_tx.find_one_and_update(
                 {"hash": d_oper['hash']},
