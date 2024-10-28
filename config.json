@@ -1,17 +1,18 @@
 {
-  "uri": "https://public-node.testnet.rsk.co",
+  "uri": "https://public-node.rsk.co",
   "collateral": "rc20",
   "app_project": "roc",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "roc_v2_testnet"
+    "db": "roc_v2_mainnet"
   },
   "debug": true,
   "tasks": {
     "scan_raw_transactions": {"interval":  2},
     "scan_raw_transactions_confirming": {"interval":  2},
     "scan_logs": {"interval":  2},
-    "scan_tx_status": {"interval":  2}
+    "scan_tx_status": {"interval":  2},
+    "scan_raw_transactions_history": {"interval":  2}
   },
   "scan_logs": {
     "confirm_blocks": 10
@@ -19,15 +20,21 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 4862257,
-    "to_block": 0,
+    "from_block": 6391078,
+    "to_block": 6391079,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 4862257,
-    "to_block": 0,
+    "from_block": 6391078,
+    "to_block": 6391079,
+    "max_blocks_to_process": 100
+  },
+  "scan_raw_transactions_history": {
+    "blocks_recession": 0,
+    "from_block": 2858441,
+    "to_block": 2858446,
     "max_blocks_to_process": 100
   },
   "scan_tx_status": {
@@ -35,12 +42,14 @@
     "confirm_blocks": 10
   },
   "addresses": {
-    "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "Moc": "0xa416934264515bb381E3b746f10f22D5c6f9431a",
-    "MocQueue": "0xcbfe89ABB069AE87E26d0cd84F70F6BD599A3ad9",
-    "TC": "0x23A1aA7b11e68beBE560a36beC04D1f79357f28d",
-    "TP": ["0x8dbf326e12a9fF37ED6DDF75adA548C2640A6482"],
-    "CA": ["0x19F64674D8A5B4E652319F5e239eFd3bc969A1fE"],
-    "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A"
+    "Multicall2": "0x8f344c3b2a02a801c24635f594c5652c8a2eb02a",
+    "Moc": "0xA27024Ed70035E46dba712609fc2Afa1c97aA36A",
+    "MocQueue": "0x9181E99dceace7dFd5f2E7d5126275D54067A9E3",
+    "TC": "0xf4d27c56595Ed59B66cC7F03CFF5193e4bd74a61",
+    "TP": ["0x3A15461d8aE0F0Fb5Fa2629e9DA7D66A794a6e37"],
+    "CA": ["0x2AcC95758f8b5F583470ba265EB685a8F45fC9D5"],
+    "FastBtcBridge": "0x1A8E78B41bc5Ab9Ebb6996136622B9b41A601b5C",
+    "IRegistry": "0xCD101a2414256DA8F8E25d7b483b3cf639a71683",
+    "IncentiveV2": ""
   }
 }

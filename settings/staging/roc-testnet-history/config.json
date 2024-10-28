@@ -10,6 +10,7 @@
   "tasks": {
     "scan_raw_transactions": {"interval":  2},
     "scan_raw_transactions_confirming": {"interval":  2},
+    "scan_raw_transactions_history": {"interval":  2},
     "scan_logs": {"interval":  2},
     "scan_tx_status": {"interval":  2}
   },
@@ -28,6 +29,12 @@
     "blocks_recession": 1,
     "from_block": 4862257,
     "to_block": 0,
+    "max_blocks_to_process": 100
+  },
+  "scan_raw_transactions_history": {
+    "blocks_recession": 0,
+    "from_block": 3600001,
+    "to_block": 5580000,
     "max_blocks_to_process": 100
   },
   "scan_tx_status": {

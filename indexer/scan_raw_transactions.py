@@ -14,6 +14,7 @@ LOCAL_TIMEZONE = datetime.datetime.now().astimezone().tzinfo
 def filter_transactions(transactions, filter_addresses):
     l_transactions = list()
     d_index_transactions = dict()
+
     for transaction in transactions:
         tx_to = None
         tx_from = None
@@ -298,18 +299,111 @@ def scan_raw_txs_confirming(options, connection_helper, filter_contracts, task=N
         log.info("[5. Scan Raw Txs Confirming] Done! Processed: [{0}] in [{1} seconds]".format(processed, duration))
 
 
+def scan_raw_txs_history(options, connection_helper, filter_contracts, task=None):
+
+    start_time = time.time()
+
+    config_blocks_recession = options['scan_raw_transactions_history']['blocks_recession']
+    debug_mode = options['debug']
+
+    collection_moc_indexer = connection_helper.mongo_collection('moc_indexer')
+    protocol_index = collection_moc_indexer.find_one(sort=[("updatedAt", -1)])
+
+    last_block_indexed = 0
+    if protocol_index:
+        if 'last_raw_tx_history_block' in protocol_index:
+            last_block_indexed = protocol_index['last_raw_tx_history_block']
+
+    # get last block from node compare 1 blocks older than new
+    last_block = connection_helper.connection_manager.block_number - config_blocks_recession
+
+    from_block = options['scan_raw_transactions_history']['from_block']
+
+    if last_block_indexed > 0:
+        from_block = last_block_indexed + 1
+
+    to_block = options['scan_raw_transactions_history']['to_block']
+    if last_block_indexed >= to_block:
+        if debug_mode:
+            log.info("[6. Scan Raw Txs history] Its not the time to run indexer no new blocks available!")
+        return
+
+
+    # only process a max of numer of blocks in one iteration of this task
+    to_block = min(to_block, from_block + options['scan_raw_transactions_history']['max_blocks_to_process'])
+
+    if from_block > to_block:
+        if debug_mode:
+            log.info("[6. Scan Raw Txs history] Its not the time to run indexer no new blocks available!")
+        return
+
+    # start with from block
+    current_block = from_block
+
+    if debug_mode:
+        log.info("[6. Scan Raw Txs History] Starting to Scan Transactions [{0} / {1}]".format(from_block, to_block))
+
+    processed = 0
+    while current_block <= to_block:
+
+        # index our contracts only
+        block_processed = index_raw_tx(
+            connection_helper,
+            current_block,
+            last_block,
+            filter_tx=filter_contracts,
+            debug_mode=debug_mode,
+            processed=processed,
+            confirm_mode=False)
+
+        if debug_mode:
+            log.info("[6. Scan Raw Txs History] OK [{0}] / [{1}]".format(current_block, to_block))
+
+        collection_moc_indexer.update_one({},
+                                          {'$set': {'last_raw_tx_history_block': current_block}},
+                                          upsert=True)
+        processed = block_processed["processed"]
+
+        # Go to next block
+        current_block += 1
+
+    duration = time.time() - start_time
+
+    if processed > 0:
+        log.warning("[6. Scan Raw Txs History] Reindexing [{0}] in [{1} seconds]".format(processed, duration))
+    else:
+        log.info("[6. Scan Raw Txs History] Done! Processed: [{0}] in [{1} seconds]".format(processed, duration))
+
+
 class ScanRawTxs:
 
     def __init__(self, options, connection_helper, filter_contracts):
         self.options = options
         self.connection_helper = connection_helper
         self.filter_contracts = filter_contracts
+        self.filter_contracts_vesting = []
 
     def on_init(self):
         pass
 
+    def on_load_vesting(self):
+
+        vesting_created = self.connection_helper.mongo_collection('event_VestingFactory_VestingCreated')
+        all_vesting = vesting_created.find({})
+        l_vesting = []
+        for vesting in all_vesting:
+            l_vesting.append(vesting['vesting'].lower())
+
+        self.filter_contracts_vesting = l_vesting
+
     def on_task(self, task=None):
-        scan_raw_txs(self.options, self.connection_helper, self.filter_contracts, task=task)
+        self.on_load_vesting()
+        scan_raw_txs(self.options, self.connection_helper, self.filter_contracts + self.filter_contracts_vesting, task=task)
 
     def on_task_confirming(self, task=None):
-        scan_raw_txs_confirming(self.options, self.connection_helper, self.filter_contracts, task=task)
+        self.on_load_vesting()
+        scan_raw_txs_confirming(self.options, self.connection_helper, self.filter_contracts + self.filter_contracts_vesting, task=task)
+
+    def on_task_history(self, task=None):
+        self.on_load_vesting()
+        scan_raw_txs_history(self.options, self.connection_helper, self.filter_contracts + self.filter_contracts_vesting, task=task)
