@@ -863,7 +863,13 @@ class EventMocQueueTPMinted(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
-        d_event["tp"] = sanitize_address(parsed["tp"])
+
+        if 'tp' in parsed:
+            tp_key_name = 'tp'
+        else:
+            tp_key_name = 'tp_'
+
+        d_event["tp"] = sanitize_address(parsed[tp_key_name])
         d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
