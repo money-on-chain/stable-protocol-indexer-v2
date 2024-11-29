@@ -477,6 +477,8 @@ class EventMocQueueOperationQueued(BaseEvent):
         # write to collection operations as queue operation
         collection = self.connection_helper.mongo_collection('operations')
 
+        # getting the information from the MoCQueue, but take in consideration that
+        # after the execution of the queue this is information is no longer available
         operation = None
         d_params = dict()
         if d_event["operType_"] == 1:
