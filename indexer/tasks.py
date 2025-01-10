@@ -13,7 +13,7 @@ from .scan_raw_transactions import ScanRawTxs
 from .scan_logs_transactions import ScanLogsTransactions
 from .scan_transactions_status import ScanTxStatus
 
-__VERSION__ = '4.2.4'
+__VERSION__ = '4.2.5'
 
 log.info("Starting Protocol Indexer version {0}".format(__VERSION__))
 
@@ -113,62 +113,64 @@ class StableIndexerTasks(TasksManager):
         omoc = read_omoc_json_file()
 
         # IRegistry
-        self.contracts_loaded["IRegistry"] = OMOCIRegistry(
-            self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.config['addresses']['IRegistry'])
-        self.contracts_addresses['IRegistry'] = self.contracts_loaded["IRegistry"].address().lower()
-
-        # Getting addresses from Registry
-        self.contracts_addresses['DelayMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['MOC_DELAY_MACHINE']).call().lower()
-        self.contracts_addresses['Supporters'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['SUPPORTERS_ADDR']).call().lower()
-        self.contracts_addresses['VestingFactory'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['MOC_VESTING_MACHINE']).call().lower()
-        self.contracts_addresses['VotingMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['MOC_VOTING_MACHINE']).call().lower()
-        self.contracts_addresses['StakingMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
-            omoc['RegistryConstants']['MOC_STAKING_MACHINE']).call().lower()
-
-        # IncentiveV2
-        if self.config['addresses']['IncentiveV2']:
-            self.contracts_loaded["IncentiveV2"] = OMOCIncentiveV2(
+        if self.config['addresses']['IRegistry']:
+            self.contracts_loaded["IRegistry"] = OMOCIRegistry(
                 self.connection_helper.connection_manager,
                 self.config,
-                contract_address=self.config['addresses']['IncentiveV2'])
-            self.contracts_addresses['IncentiveV2'] = self.contracts_loaded["IncentiveV2"].address().lower()
+                contract_address=self.config['addresses']['IRegistry'])
+            self.contracts_addresses['IRegistry'] = self.contracts_loaded["IRegistry"].address().lower()
 
-        # DelayMachine
-        self.contracts_loaded["DelayMachine"] = OMOCDelayMachine(
-            self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.contracts_addresses['DelayMachine'])
+            # Getting addresses from Registry
+            self.contracts_addresses['DelayMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+                omoc['RegistryConstants']['MOC_DELAY_MACHINE']).call().lower()
+            self.contracts_addresses['Supporters'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+                omoc['RegistryConstants']['SUPPORTERS_ADDR']).call().lower()
+            self.contracts_addresses['VestingFactory'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+                omoc['RegistryConstants']['MOC_VESTING_MACHINE']).call().lower()
+            self.contracts_addresses['VotingMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+                omoc['RegistryConstants']['MOC_VOTING_MACHINE']).call().lower()
+            self.contracts_addresses['StakingMachine'] = self.contracts_loaded["IRegistry"].sc.functions.getAddress(
+                omoc['RegistryConstants']['MOC_STAKING_MACHINE']).call().lower()
 
-        # Supporters
-        self.contracts_loaded["Supporters"] = OMOCSupporters(
-            self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.contracts_addresses['Supporters'])
+            # IncentiveV2
+            if self.config['addresses']['IncentiveV2']:
+                self.contracts_loaded["IncentiveV2"] = OMOCIncentiveV2(
+                    self.connection_helper.connection_manager,
+                    self.config,
+                    contract_address=self.config['addresses']['IncentiveV2'])
+                self.contracts_addresses['IncentiveV2'] = self.contracts_loaded["IncentiveV2"].address().lower()
 
-        # VestingFactory
-        self.contracts_loaded["VestingFactory"] = OMOCVestingFactory(
-            self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.contracts_addresses['VestingFactory'])
+            # DelayMachine
+            self.contracts_loaded["DelayMachine"] = OMOCDelayMachine(
+                self.connection_helper.connection_manager,
+                self.config,
+                contract_address=self.contracts_addresses['DelayMachine'])
 
-        # VotingMachine
-        self.contracts_loaded["VotingMachine"] = OMOCVotingMachine(
-            self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.contracts_addresses['VotingMachine'])
-        self.contracts_addresses['VotingMachine'] = self.contracts_loaded["VotingMachine"].address().lower()
+            # Supporters
+            self.contracts_loaded["Supporters"] = OMOCSupporters(
+                self.connection_helper.connection_manager,
+                self.config,
+                contract_address=self.contracts_addresses['Supporters'])
+
+            # VestingFactory
+            self.contracts_loaded["VestingFactory"] = OMOCVestingFactory(
+                self.connection_helper.connection_manager,
+                self.config,
+                contract_address=self.contracts_addresses['VestingFactory'])
+
+            # VotingMachine
+            self.contracts_loaded["VotingMachine"] = OMOCVotingMachine(
+                self.connection_helper.connection_manager,
+                self.config,
+                contract_address=self.contracts_addresses['VotingMachine'])
+            self.contracts_addresses['VotingMachine'] = self.contracts_loaded["VotingMachine"].address().lower()
 
         # FastBTCBridge
-        self.contracts_loaded["FastBtcBridge"] = FastBtcBridge(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['FastBtcBridge'])
-        self.contracts_addresses['FastBtcBridge'] = self.config['addresses']['FastBtcBridge']
+        if self.config['addresses']['FastBtcBridge']:
+            self.contracts_loaded["FastBtcBridge"] = FastBtcBridge(
+                self.connection_helper.connection_manager,
+                contract_address=self.config['addresses']['FastBtcBridge'])
+            self.contracts_addresses['FastBtcBridge'] = self.config['addresses']['FastBtcBridge']
 
         self.filter_contracts_addresses = []
         for k, v in self.contracts_addresses.items():
