@@ -1,16 +1,17 @@
 {
-  "uri": "https://sepolia.drpc.org",
-  "collateral": "coinbase",
-  "app_project": "stablex",
+  "uri": "http://localhost:4454",
+  "collateral": "rc20",
+  "app_project": "roc",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "stablex_testnet"
+    "db": "roc_v2_mainnet"
   },
   "debug": true,
   "tasks": {
-    "scan_raw_transactions": {"interval":  30},
-    "scan_logs": {"interval":  30},
-    "scan_tx_status": {"interval":  30}
+    "scan_raw_transactions": {"interval":  2},
+    "scan_raw_transactions_confirming": {"interval":  2},
+    "scan_logs": {"interval":  2},
+    "scan_tx_status": {"interval":  2}
   },
   "scan_logs": {
     "confirm_blocks": 10
@@ -18,15 +19,15 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 7455524,
-    "to_block": 7455525,
+    "from_block": 7160000,
+    "to_block": 0,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 7455519,
-    "to_block": 7455520,
+    "from_block": 7160000,
+    "to_block": 0,
     "max_blocks_to_process": 100
   },
   "scan_tx_status": {
@@ -34,14 +35,14 @@
     "confirm_blocks": 10
   },
   "addresses": {
-    "Multicall2": "0xcA11bde05977b3631167028862bE2a173976CA11",
-    "Moc": "0x3371c7c5DEA20f95eD1D7bAb94016E47A60Cc31b",
-    "MocQueue": "0xb644Fb3e27ec15A677F271D6B04522b97f4B8a30",
-    "TC": "0x1A28AC6C54fA6AFcf941fCFb09bA164704a15b0d",
-    "TP": ["0x6F70D18E342a6AAd7302aF6D24f7D5Ef3B4424E8"],
-    "CA": [],
-    "FastBtcBridge": "",
-    "IRegistry": "",
+    "Multicall2": "0x8f344c3b2a02a801c24635f594c5652c8a2eb02a",
+    "Moc": "0xA27024Ed70035E46dba712609fc2Afa1c97aA36A",
+    "MocQueue": "0x9181E99dceace7dFd5f2E7d5126275D54067A9E3",
+    "TC": "0xf4d27c56595Ed59B66cC7F03CFF5193e4bd74a61",
+    "TP": ["0x3A15461d8aE0F0Fb5Fa2629e9DA7D66A794a6e37"],
+    "CA": ["0x2AcC95758f8b5F583470ba265EB685a8F45fC9D5"],
+    "FastBtcBridge": "0x1A8E78B41bc5Ab9Ebb6996136622B9b41A601b5C",
+    "IRegistry": "0xCD101a2414256DA8F8E25d7b483b3cf639a71683",
     "IncentiveV2": ""
   }
 }
