@@ -88,7 +88,7 @@ class EventMocLiqTPRedeemed(BaseEvent):
         d_event["bucket_index"] = self.bucket_index
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"]).lower()
         d_event["recipient_"] = sanitize_address(parsed["recipient_"]).lower()
         d_event["qTP_"] = parsed["qTP_"]
@@ -705,7 +705,7 @@ class EventMocQueueOperationQueued(BaseEvent):
             raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsMintTP(d_event["operId_"]).call()
             d_params['tp'] = sanitize_address(raw_params[0])
             if d_params['tp']:
-                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'])
+                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'].lower())
             else:
                 # by default the first one
                 d_params['tpIndex'] = 0
@@ -1178,7 +1178,7 @@ class EventMocQueueTPMinted(BaseEvent):
             tp_key_name = 'tp_'
 
         d_event["tp"] = sanitize_address(parsed[tp_key_name])
-        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTP_"] = str(parsed["qTP_"])
@@ -1285,7 +1285,7 @@ class EventMocQueueTPRedeemed(BaseEvent):
         d_event["id_event"] = id_event
         d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTP_"] = str(parsed["qTP_"])
@@ -1392,9 +1392,9 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         d_event["id_event"] = id_event
         d_event["bucket_index"] = self.bucket_index
         d_event["tpFrom_"] = sanitize_address(parsed["tpFrom_"])
-        d_event['tpFromIndex_'] = self.contracts_addresses['TP'].index(d_event["tpFrom_"])
+        d_event['tpFromIndex_'] = self.contracts_addresses['TP'].index(d_event["tpFrom_"].lower())
         d_event["tpTo_"] = sanitize_address(parsed["tpTo_"])
-        d_event['tpToIndex_'] = self.contracts_addresses['TP'].index(d_event["tpTo_"])
+        d_event['tpToIndex_'] = self.contracts_addresses['TP'].index(d_event["tpTo_"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTPfrom_"] = str(parsed["qTPfrom_"])
@@ -1501,7 +1501,7 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         d_event["id_event"] = id_event
         d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1608,7 +1608,7 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         d_event["id_event"] = id_event
         d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1714,7 +1714,7 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         d_event["id_event"] = id_event
         d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1821,7 +1821,7 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         d_event["id_event"] = id_event
         d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"].lower())
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])

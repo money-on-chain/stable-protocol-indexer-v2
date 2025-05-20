@@ -7,10 +7,10 @@
   },
   "debug": true,
   "tasks": {
-    "scan_raw_transactions": {"interval":  2},
-    "scan_raw_transactions_confirming": {"interval":  2},
-    "scan_logs": {"interval":  2},
-    "scan_tx_status": {"interval":  2}
+    "scan_raw_transactions": {"interval":  15},
+    "scan_raw_transactions_confirming": {"interval":  15},
+    "scan_logs": {"interval":  15},
+    "scan_tx_status": {"interval":  15}
   },
   "scan_logs": {
     "confirm_blocks": 10
@@ -18,15 +18,15 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 6394157,
-    "to_block": 6394158,
+    "from_block": 6409023,
+    "to_block": 0,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 6394157,
-    "to_block": 6394158,
+    "from_block": 6409023,
+    "to_block": 0,
     "max_blocks_to_process": 100
   },
   "scan_tx_status": {
