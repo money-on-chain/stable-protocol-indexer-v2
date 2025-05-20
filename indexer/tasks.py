@@ -6,14 +6,14 @@ from .base.main import ConnectionHelperMongo
 from .base.token import ERC20Token
 from .tasks_manager import TasksManager
 from .logger import log
-from .contracts import Multicall2, Moc, FastBtcBridge, MocQueue, \
+from .contracts import Multicall2, MocMultiCollateralGuard, MocCARC20, MocCACoinbase, MocQueue, \
     OMOCDelayMachine, OMOCIncentiveV2, OMOCSupporters, OMOCVestingFactory, \
     OMOCVotingMachine, OMOCIRegistry
 from .scan_raw_transactions import ScanRawTxs
 from .scan_logs_transactions import ScanLogsTransactions
 from .scan_transactions_status import ScanTxStatus
 
-__VERSION__ = '4.2.4'
+__VERSION__ = '4.3.0'
 
 log.info("Starting Protocol Indexer version {0}".format(__VERSION__))
 
@@ -53,60 +53,98 @@ class StableIndexerTasks(TasksManager):
         """ Get contract address to use later """
 
         log.info("Loading contracts...")
+        log.info("Getting addresses from Main Contract...")
 
         self.contracts_loaded["Multicall2"] = Multicall2(
             self.connection_helper.connection_manager,
             contract_address=self.config['addresses']['Multicall2'])
         #self.contracts_addresses['Multicall2'] = self.contracts_loaded["Multicall2"].address().lower()
 
-        # Moc
-        self.contracts_loaded["Moc"] = Moc(
+        log.info("MocMultiCollateralGuard using address: %s" % self.config['addresses']['MocMultiCollateralGuard'])
+        # MocMultiCollateralGuard
+        self.contracts_loaded["MocMultiCollateralGuard"] = MocMultiCollateralGuard(
             self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.config['addresses']['Moc'])
-        self.contracts_addresses['Moc'] = self.contracts_loaded["Moc"].address().lower()
+            contract_address=self.config['addresses']['MocMultiCollateralGuard'])
+        self.contracts_addresses['MocMultiCollateralGuard'] = self.contracts_loaded[
+            "MocMultiCollateralGuard"].address().lower()
 
-        # MocQueue
-        self.contracts_loaded["MocQueue"] = MocQueue(
-            self.connection_helper.connection_manager,
-            self.config,
-            contract_address=self.config['addresses']['MocQueue'])
-        self.contracts_addresses['MocQueue'] = self.contracts_loaded["MocQueue"].address().lower()
+        # Reading MoC Buckets from Multi collateral Guard
+        self.contracts_loaded['Moc'] = list()
+        self.contracts_loaded["CA"] = list()
+        self.contracts_loaded["TC"] = list()
+        self.contracts_loaded["MocQueue"] = list()
 
-        # Token TC
-        self.contracts_loaded["TC"] = ERC20Token(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['TC'])
-        self.contracts_addresses['TC'] = self.contracts_loaded["TC"].address().lower()
+        self.contracts_addresses['Moc'] = list()
+        self.contracts_addresses['CA'] = list()
+        self.contracts_addresses['TC'] = list()
+        self.contracts_addresses['MocQueue'] = list()
 
-        # TP Tokens load
+        for ca_index, ca in enumerate(self.config['collateral']):
+            # get bucket address from guard
+            moc_bucket_address = self.contracts_loaded["MocMultiCollateralGuard"].buckets(ca_index)
+
+            contract_interface = MocCACoinbase
+            if ca['type'] == 'rc20':
+                contract_interface = MocCARC20
+
+            log.info("MoC Bucket ({0}) using address: {1}".format(ca['name'], moc_bucket_address))
+
+            moc_bucket = contract_interface(
+                self.connection_helper.connection_manager,
+                contract_address=moc_bucket_address)
+            self.contracts_loaded['Moc'].append(moc_bucket)
+            self.contracts_addresses['Moc'].append(moc_bucket.address().lower())
+
+            if ca['type']  == 'rc20':
+                ca_token_address = moc_bucket.ac_token()
+                ca_token = ERC20Token(
+                    self.connection_helper.connection_manager,
+                    contract_address=ca_token_address)
+                self.contracts_loaded["CA"].append(ca_token)
+                self.contracts_addresses['CA'].append(ca_token_address.lower())
+
+            # MocQueue
+            moc_queue_addr = moc_bucket.moc_queue()
+            self.contracts_loaded["MocQueue"].append(MocQueue(
+                self.connection_helper.connection_manager,
+                self.config,
+                contract_address=moc_queue_addr))
+            self.contracts_addresses['MocQueue'].append(moc_queue_addr.lower())
+
+            # Token TC
+            tc_token_addr = moc_bucket.tc_token()
+            self.contracts_loaded["TC"].append(ERC20Token(
+                self.connection_helper.connection_manager,
+                contract_address=tc_token_addr))
+            self.contracts_addresses['TC'].append(tc_token_addr.lower())
+
+        # TP Token Pegged
+        # In multi-collateral we have the assumption that all collateral
+        # have the same TPs, this why only watch the first collateral only
         self.contracts_loaded["TP"] = list()
         self.contracts_addresses['TP'] = list()
-        for t_pegged in self.config['addresses']['TP']:
+        bucket_index = 0
+        for tp_i, tp in enumerate(self.config['pegged']):
+            tp_address = self.contracts_loaded["Moc"][bucket_index].tp_tokens(tp_i)
+            if not tp_address:
+                continue
             self.contracts_loaded["TP"].append(
                 ERC20Token(
                     self.connection_helper.connection_manager,
-                    contract_address=t_pegged)
+                    contract_address=tp_address)
             )
-            self.contracts_addresses['TP'].append(t_pegged.lower())
+            self.contracts_addresses['TP'].append(tp_address.lower())
 
-        # CA Tokens load
-        self.contracts_loaded["CA"] = list()
-        self.contracts_addresses['CA'] = list()
-        for c_asset in self.config['addresses']['CA']:
-            self.contracts_loaded["CA"].append(
-                ERC20Token(
-                    self.connection_helper.connection_manager,
-                    contract_address=c_asset)
-            )
-            self.contracts_addresses['CA'].append(c_asset.lower())
+        # FeeToken
+        # NOTE: In multi-collateral we have the assumption that all collateral
+        # have the same FeeToken, this why only watch the first collateral only
 
-        # Token FeeToken
-        if 'FeeToken' in self.config['addresses']:
-            self.contracts_loaded["FeeToken"] = ERC20Token(
-                self.connection_helper.connection_manager,
-                contract_address=self.config['addresses']['FeeToken'])
-            self.contracts_addresses['FeeToken'] = self.contracts_loaded["FeeToken"].address().lower()
+        bucket_index = 0
+        fee_token_address = self.contracts_loaded["Moc"][bucket_index].fee_token()
+        self.contracts_loaded["FeeToken"] = ERC20Token(
+            self.connection_helper.connection_manager,
+            contract_address=fee_token_address)
+        self.contracts_addresses['FeeToken'] = self.contracts_loaded["FeeToken"].address().lower()
 
         # OMOC
 
@@ -163,12 +201,6 @@ class StableIndexerTasks(TasksManager):
             self.config,
             contract_address=self.contracts_addresses['VotingMachine'])
         self.contracts_addresses['VotingMachine'] = self.contracts_loaded["VotingMachine"].address().lower()
-
-        # FastBTCBridge
-        self.contracts_loaded["FastBtcBridge"] = FastBtcBridge(
-            self.connection_helper.connection_manager,
-            contract_address=self.config['addresses']['FastBtcBridge'])
-        self.contracts_addresses['FastBtcBridge'] = self.config['addresses']['FastBtcBridge']
 
         self.filter_contracts_addresses = []
         for k, v in self.contracts_addresses.items():

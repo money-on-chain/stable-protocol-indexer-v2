@@ -28,11 +28,12 @@ class BaseEvent:
     name = 'Name'
     precision = 10 ** 18
 
-    def __init__(self, options, connection_helper, contracts_loaded, filter_contracts_addresses, block_info):
+    def __init__(self, options, connection_helper, contracts_loaded, contracts_addresses, filter_contracts_addresses, block_info):
 
         self.options = options
         self.connection_helper = connection_helper
         self.contracts_loaded = contracts_loaded
+        self.contracts_addresses = contracts_addresses
         self.filter_contracts_addresses = filter_contracts_addresses
         self.block_info = block_info
 
@@ -45,6 +46,30 @@ class BaseEvent:
 
 
 class EventMocLiqTPRedeemed(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
+
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -60,9 +85,10 @@ class EventMocLiqTPRedeemed(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"]).lower()
         d_event["recipient_"] = sanitize_address(parsed["recipient_"]).lower()
         d_event["qTP_"] = parsed["qTP_"]
@@ -80,13 +106,37 @@ class EventMocLiqTPRedeemed(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: Moc_LiqTPRedeemed :: {0}".format(d_event["id_event"]))
+        log.info("Event :: Moc_LiqTPRedeemed :: bucket: {0} :: id: {1}".format(self.bucket_index, d_event["id_event"]))
         log.info(d_event)
 
         return d_event, parsed
 
 
 class EventMocSuccessFeeDistributed(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
+
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -102,6 +152,7 @@ class EventMocSuccessFeeDistributed(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["mocGain_"] = str(parsed["mocGain_"])
         d_event["tpGain_"] = str(parsed["tpGain_"])
@@ -118,13 +169,37 @@ class EventMocSuccessFeeDistributed(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: Success Fee Distributed :: {0}".format(d_event["id_event"]))
+        log.info("Event :: Success Fee Distributed :: bucket: {0} :: id: {1}".format(self.bucket_index, d_event["id_event"]))
         log.info(d_event)
 
         return d_event, parsed
 
 
 class EventMocSettlementExecuted(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
+
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -140,6 +215,7 @@ class EventMocSettlementExecuted(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
@@ -154,13 +230,36 @@ class EventMocSettlementExecuted(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: Settlement Executed :: {0}".format(d_event["id_event"]))
+        log.info("Event :: Settlement Executed :: bucket: {0} :: id: {1}".format(self.bucket_index, d_event["id_event"]))
         log.info(d_event)
 
         return d_event, parsed
 
 
 class EventMocTCInterestPayment(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -176,6 +275,7 @@ class EventMocTCInterestPayment(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["interestAmount_"] = str(parsed["interestAmount_"])
         d_event["createdAt"] = parsed["createdAt"]
@@ -191,13 +291,36 @@ class EventMocTCInterestPayment(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: TC Interest Payment :: {0} ".format(d_event["id_event"]))
+        log.info("Event :: TC Interest Payment :: bucket: {0} :: id: {1} ".format(self.bucket_index, d_event["id_event"]))
         log.info(d_event)
 
         return d_event, parsed
 
 
 class EventMocTPemaUpdated(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -213,6 +336,7 @@ class EventMocTPemaUpdated(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["i_"] = oper_id_to_int(parsed["i_"])
         d_event["oldTPema_"] = str(parsed["oldTPema_"])
@@ -230,13 +354,36 @@ class EventMocTPemaUpdated(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: TP Ema Updated :: {0}".format(d_event["id_event"]))
+        log.info("Event :: TP Ema Updated :: bucket: {0} :: id: {1}".format(self.bucket_index, d_event["id_event"]))
         log.info(d_event)
 
         return d_event, parsed
 
 
 class EventMocQueueOperationError(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -277,6 +424,7 @@ class EventMocQueueOperationError(BaseEvent):
         d_event["id_event"] = id_event
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["bucket_index"] = self.bucket_index
         d_event["errorCode_"] = parsed["errorCode_"]
         d_event["msg_"] = parsed["msg_"]
         d_event["createdAt"] = parsed["createdAt"]
@@ -292,7 +440,7 @@ class EventMocQueueOperationError(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: OperationError :: operId_: {0}".format(d_event["operId_"]))
+        log.info("Event :: OperationError :: bucket: {0} :: operId_: {1}".format(self.bucket_index, d_event["operId_"]))
         log.info(d_event)
 
         # change status in collection operations
@@ -303,6 +451,7 @@ class EventMocQueueOperationError(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = oper_id_to_int(d_event["operId_"])
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
         d_oper["gasUsed"] = int(parsed['gasUsed'])
@@ -321,14 +470,16 @@ class EventMocQueueOperationError(BaseEvent):
         # Constant: MAX_FLUX_CAPACITOR_REACHED
         if d_oper["errorCode_"] == "0x0db483ca":
             # skip if is a problem with flux capacitor stay on the queue, so set queue status
-            log.warning("Event :: OperationError :: operId_: {0} Skipping... Fluxcapacitor limitation not failing".format(d_event["operId_"]))
+            log.warning("Event :: OperationError :: bucket: {0} :: operId_: {1} Skipping... Fluxcapacitor limitation not failing".format(
+                self.bucket_index, d_event["operId_"]))
             d_oper["status"] = 0
 
         operation = collection.find_one({"operId_": d_oper["operId_"]})
         if operation:
             if operation['status'] >= 1:
                 # if executed don't update
-                log.warning("Event :: OperationError :: operId_: {0} Skipping writting to database is already in status 1".format(d_event["operId_"]))
+                log.warning("Event :: OperationError :: bucket: {0} :: operId_: {1} Skipping writting to database is already in status 1".format(
+                    self.bucket_index, d_event["operId_"]))
                 return d_oper, parsed
 
         collection.find_one_and_update(
@@ -340,6 +491,29 @@ class EventMocQueueOperationError(BaseEvent):
 
 
 class EventMocQueueUnhandledError(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -365,6 +539,7 @@ class EventMocQueueUnhandledError(BaseEvent):
         d_event["id_event"] = id_event
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["operId_"] = oper_id_to_int(parsed["operId_"])
+        d_event["bucket_index"] = self.bucket_index
         d_event["reason_"] = parsed["reason_"]
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
@@ -379,7 +554,8 @@ class EventMocQueueUnhandledError(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: MocQueue_UnhandledError :: operId_: {0}".format(d_event["operId_"]))
+        log.info("Event :: MocQueue_UnhandledError :: bucket: {0} :: operId_: {1}".format(
+            self.bucket_index, d_event["operId_"]))
         log.info(d_event)
 
         # change status in collection operations
@@ -390,6 +566,7 @@ class EventMocQueueUnhandledError(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = oper_id_to_int(d_event["operId_"])
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["gas"] = parsed['gas']
         d_oper["gasPrice"] = str(parsed['gasPrice'])
         d_oper["gasUsed"] = int(parsed['gasUsed'])
@@ -406,7 +583,8 @@ class EventMocQueueUnhandledError(BaseEvent):
         if operation:
             if operation['status'] >= 1:
                 # if executed don't update
-                log.warning("Event :: MocQueue_UnhandledError :: Skipping writting to database is already in status 1")
+                log.warning("Event :: MocQueue_UnhandledError :: bucket: {0} :: Skipping writting to database is already in status 1".format(
+                    self.bucket_index))
                 return d_oper, parsed
 
         collection.find_one_and_update(
@@ -418,6 +596,29 @@ class EventMocQueueUnhandledError(BaseEvent):
 
 
 class EventMocQueueOperationQueued(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -457,6 +658,7 @@ class EventMocQueueOperationQueued(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["operId_"] = oper_id_to_int(parsed["operId_"])
         d_event["bucket_"] = sanitize_address(parsed["bucket_"])
+        d_event["bucket_index"] = self.bucket_index
         d_event["operType_"] = int(parsed["operType_"])
         d_event["createdAt"] = parsed["createdAt"]
         d_event["lastUpdatedAt"] = datetime.datetime.now()
@@ -471,7 +673,8 @@ class EventMocQueueOperationQueued(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: MocQueue_OperationQueued :: operId_: {0}".format(d_event["operId_"]))
+        log.info("Event :: MocQueue_OperationQueued :: bucket: {0} :: operId_: {0}".format(
+            self.bucket_index, d_event["operId_"]))
         log.info(d_event)
 
         # write to collection operations as queue operation
@@ -483,7 +686,7 @@ class EventMocQueueOperationQueued(BaseEvent):
         d_params = dict()
         if d_event["operType_"] == 1:
             operation = 'TCMint'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTC(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsMintTC(d_event["operId_"]).call()
             d_params['qTC'] = str(raw_params[0])
             d_params['qACmax'] = str(raw_params[1])
             d_params['sender'] = sanitize_address(raw_params[2])
@@ -491,7 +694,7 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[4])
         elif d_event["operType_"] == 2:
             operation = 'TCRedeem'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTC(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsRedeemTC(d_event["operId_"]).call()
             d_params['qTC'] = str(raw_params[0])
             d_params['qACmin'] = str(raw_params[1])
             d_params['sender'] = sanitize_address(raw_params[2])
@@ -499,10 +702,10 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[4])
         elif d_event["operType_"] == 3:
             operation = 'TPMint'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTP(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsMintTP(d_event["operId_"]).call()
             d_params['tp'] = sanitize_address(raw_params[0])
             if d_params['tp']:
-                d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
+                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'])
             else:
                 # by default the first one
                 d_params['tpIndex'] = 0
@@ -513,10 +716,10 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[5])
         elif d_event["operType_"] == 4:
             operation = 'TPRedeem'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTP(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsRedeemTP(d_event["operId_"]).call()
             d_params['tp'] = sanitize_address(raw_params[0])
             if d_params['tp']:
-                d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
+                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'])
             else:
                 # by default the first one
                 d_params['tpIndex'] = 0
@@ -527,10 +730,10 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[5])
         elif d_event["operType_"] == 5:
             operation = 'TCandTPMint'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsMintTCandTP(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsMintTCandTP(d_event["operId_"]).call()
             d_params['tp'] = sanitize_address(raw_params[0])
             if d_params['tp']:
-                d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
+                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'])
             else:
                 # by default the first one
                 d_params['tpIndex'] = 0
@@ -541,10 +744,10 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[5])
         elif d_event["operType_"] == 6:
             operation = 'TCandTPRedeem'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsRedeemTCandTP(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsRedeemTCandTP(d_event["operId_"]).call()
             d_params['tp'] = sanitize_address(raw_params[0])
             if d_params['tp']:
-                d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
+                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'])
             else:
                 # by default the first one
                 d_params['tpIndex'] = 0
@@ -556,10 +759,10 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[6])
         elif d_event["operType_"] == 7:
             operation = 'TCSwapForTP'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTCforTP(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsSwapTCforTP(d_event["operId_"]).call()
             d_params['tp'] = sanitize_address(raw_params[0])
             if d_params['tp']:
-                d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
+                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'])
             else:
                 # by default the first one
                 d_params['tpIndex'] = 0
@@ -571,10 +774,10 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[6])
         elif d_event["operType_"] == 8:
             operation = 'TPSwapForTC'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTPforTC(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsSwapTPforTC(d_event["operId_"]).call()
             d_params['tp'] = sanitize_address(raw_params[0])
             if d_params['tp']:
-                d_params['tpIndex'] = self.options["addresses"]["TP"].index(d_params['tp'])
+                d_params['tpIndex'] = self.contracts_addresses["TP"].index(d_params['tp'])
             else:
                 # by default the first one
                 d_params['tpIndex'] = 0
@@ -586,15 +789,15 @@ class EventMocQueueOperationQueued(BaseEvent):
             d_params['vendor'] = sanitize_address(raw_params[6])
         elif d_event["operType_"] == 9:
             operation = 'TPSwapForTP'
-            raw_params = self.contracts_loaded["MocQueue"].sc.functions.operationsSwapTPforTP(d_event["operId_"]).call()
+            raw_params = self.contracts_loaded["MocQueue"][self.bucket_index].sc.functions.operationsSwapTPforTP(d_event["operId_"]).call()
             d_params['tpFrom'] = sanitize_address(raw_params[0])
             if d_params['tpFrom']:
-                d_params['tpFromIndex'] = self.options["addresses"]["TP"].index(d_params['tpFrom'])
+                d_params['tpFromIndex'] = self.contracts_addresses["TP"].index(d_params['tpFrom'])
             else:
                 d_params['tpFromIndex'] = 0
             d_params['tpTo'] = sanitize_address(raw_params[1])
             if d_params['tpTo']:
-                d_params['tpToIndex'] = self.options["addresses"]["TP"].index(d_params['tpTo'])
+                d_params['tpToIndex'] = self.contracts_addresses["TP"].index(d_params['tpTo'])
             else:
                 d_params['tpToIndex'] = 0
             d_params['qTP'] = str(raw_params[2])
@@ -609,6 +812,7 @@ class EventMocQueueOperationQueued(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = oper_id_to_int(d_event["operId_"])
+        d_oper["bucket_index"] = self.bucket_index
         d_params['hash'] = tx_hash
         d_params['blockNumber'] = int(parsed["blockNumber"])
         d_params["createdAt"] = parsed["createdAt"]
@@ -630,7 +834,8 @@ class EventMocQueueOperationQueued(BaseEvent):
         if operation:
             if operation['status'] >= 1:
                 # if executed don't update
-                log.warning("Event :: MocQueue_OperationQueued :: Skipping writting to database is already in status 1")
+                log.warning("Event :: MocQueue_OperationQueued :: bucket: {0} :: Skipping writing to database is already in status 1".format(
+                    self.bucket_index))
                 return d_oper, parsed
 
         collection.find_one_and_update(
@@ -642,6 +847,29 @@ class EventMocQueueOperationQueued(BaseEvent):
 
 
 class EventMocQueueOperationExecuted(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -666,6 +894,7 @@ class EventMocQueueOperationExecuted(BaseEvent):
         d_event = dict()
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["operId_"] = oper_id_to_int(parsed["operId_"]) #int(parsed["operId_"].split('0x')[1])
         d_event["executor"] = sanitize_address(parsed["executor"])
@@ -682,13 +911,37 @@ class EventMocQueueOperationExecuted(BaseEvent):
             {"$set": d_event},
             upsert=True)
 
-        log.info("Event :: MocQueue_OperationExecuted :: operId_: {0}".format(d_event["operId_"]))
+        log.info("Event :: MocQueue_OperationExecuted :: bucket: {0} :: operId_: {1}".format(
+            self.bucket_index, d_event["operId_"]))
         log.info(d_event)
 
         return d_event, parsed
 
 
 class EventMocQueueTCMinted(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -705,6 +958,7 @@ class EventMocQueueTCMinted(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -745,6 +999,7 @@ class EventMocQueueTCMinted(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = d_event["operId_"]
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCMint'
         d_oper["gas"] = parsed['gas']
@@ -763,12 +1018,36 @@ class EventMocQueueTCMinted(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTCRedeemed(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -785,6 +1064,7 @@ class EventMocQueueTCRedeemed(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -825,6 +1105,7 @@ class EventMocQueueTCRedeemed(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = d_event["operId_"]
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCRedeem'
         d_oper["gas"] = parsed['gas']
@@ -843,12 +1124,36 @@ class EventMocQueueTCRedeemed(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTPMinted(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -865,6 +1170,7 @@ class EventMocQueueTPMinted(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
 
         if 'tp' in parsed:
             tp_key_name = 'tp'
@@ -872,7 +1178,7 @@ class EventMocQueueTPMinted(BaseEvent):
             tp_key_name = 'tp_'
 
         d_event["tp"] = sanitize_address(parsed[tp_key_name])
-        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTP_"] = str(parsed["qTP_"])
@@ -912,6 +1218,7 @@ class EventMocQueueTPMinted(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = d_event["operId_"]
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPMint'
         d_oper["gas"] = parsed['gas']
@@ -930,12 +1237,36 @@ class EventMocQueueTPMinted(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTPRedeemed(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -952,8 +1283,9 @@ class EventMocQueueTPRedeemed(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTP_"] = str(parsed["qTP_"])
@@ -992,6 +1324,7 @@ class EventMocQueueTPRedeemed(BaseEvent):
         d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPRedeem'
@@ -1011,12 +1344,36 @@ class EventMocQueueTPRedeemed(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTPSwappedForTP(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -1033,10 +1390,11 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["tpFrom_"] = sanitize_address(parsed["tpFrom_"])
-        d_event['tpFromIndex_'] = self.options["addresses"]["TP"].index(d_event["tpFrom_"])
+        d_event['tpFromIndex_'] = self.contracts_addresses['TP'].index(d_event["tpFrom_"])
         d_event["tpTo_"] = sanitize_address(parsed["tpTo_"])
-        d_event['tpToIndex_'] = self.options["addresses"]["TP"].index(d_event["tpTo_"])
+        d_event['tpToIndex_'] = self.contracts_addresses['TP'].index(d_event["tpTo_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTPfrom_"] = str(parsed["qTPfrom_"])
@@ -1076,6 +1434,7 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = d_event["operId_"]
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPSwapForTP'
         d_oper["gas"] = parsed['gas']
@@ -1094,12 +1453,36 @@ class EventMocQueueTPSwappedForTP(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTPSwappedForTC(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -1116,8 +1499,9 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1156,6 +1540,7 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
         d_oper["blockNumber"] = int(parsed["blockNumber"])
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["operId_"] = d_event["operId_"]
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TPSwapForTC'
@@ -1175,12 +1560,36 @@ class EventMocQueueTPSwappedForTC(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTCSwappedForTP(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
 
@@ -1197,8 +1606,9 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1238,6 +1648,7 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = d_event["operId_"]
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCSwapForTP'
         d_oper["gas"] = parsed['gas']
@@ -1256,12 +1667,36 @@ class EventMocQueueTCSwappedForTP(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTCandTPRedeemed(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -1277,8 +1712,9 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1319,6 +1755,7 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = d_event["operId_"]
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCandTPRedeem'
         d_oper["gas"] = parsed['gas']
@@ -1337,12 +1774,36 @@ class EventMocQueueTCandTPRedeemed(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventMocQueueTCandTPMinted(BaseEvent):
+
+    def __init__(self,
+                 options,
+                 connection_helper,
+                 contracts_loaded,
+                 contracts_addresses,
+                 filter_contracts_addresses,
+                 block_info,
+                 bucket_index):
+
+        self.options = options
+        self.connection_helper = connection_helper
+        self.contracts_loaded = contracts_loaded
+        self.filter_contracts_addresses = filter_contracts_addresses
+        self.block_info = block_info
+        self.bucket_index = bucket_index
+
+        super().__init__(options,
+                         connection_helper,
+                         contracts_loaded,
+                         contracts_addresses,
+                         filter_contracts_addresses,
+                         block_info)
 
     def parse_event_and_save(self, parsed_receipt, decoded_event):
         parsed = self.parse_event(parsed_receipt, decoded_event)
@@ -1358,8 +1819,9 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         d_event["blockNumber"] = int(parsed["blockNumber"])
         d_event["hash"] = tx_hash
         d_event["id_event"] = id_event
+        d_event["bucket_index"] = self.bucket_index
         d_event["tp_"] = sanitize_address(parsed["tp_"])
-        d_event['tpIndex_'] = self.options["addresses"]["TP"].index(d_event["tp_"])
+        d_event['tpIndex_'] = self.contracts_addresses['TP'].index(d_event["tp_"])
         d_event["sender_"] = sanitize_address(parsed["sender_"])
         d_event["recipient_"] = sanitize_address(parsed["recipient_"])
         d_event["qTC_"] = str(parsed["qTC_"])
@@ -1400,6 +1862,7 @@ class EventMocQueueTCandTPMinted(BaseEvent):
         d_oper["hash"] = tx_hash
         d_oper["id_event"] = id_event
         d_oper["operId_"] = d_event["operId_"]
+        d_oper["bucket_index"] = self.bucket_index
         d_oper["executed"] = d_event
         d_oper["operation"] = 'TCandTPMint'
         d_oper["gas"] = parsed['gas']
@@ -1418,14 +1881,15 @@ class EventMocQueueTCandTPMinted(BaseEvent):
             {"$set": d_oper},
             upsert=True)
 
-        log.info("Event MocQueue {0} :: operId_: {1}".format(d_oper["operation"], d_oper["operId_"]))
+        log.info("Event MocQueue {0} :: bucket: {1} :: operId_: {2}".format(
+            d_oper["operation"], self.bucket_index, d_oper["operId_"]))
 
         return d_oper
 
 
 class EventTokenTransfer(BaseEvent):
 
-    def __init__(self, options, connection_helper, contracts_loaded, filter_contracts_addresses, block_info, token_involved):
+    def __init__(self, options, connection_helper, contracts_loaded, contracts_addresses, filter_contracts_addresses, block_info, token_involved):
 
         self.options = options
         self.connection_helper = connection_helper
@@ -1434,7 +1898,7 @@ class EventTokenTransfer(BaseEvent):
         self.block_info = block_info
         self.token_involved = token_involved
 
-        super().__init__(options, connection_helper, contracts_loaded, filter_contracts_addresses, block_info)
+        super().__init__(options, connection_helper, contracts_loaded, contracts_addresses, filter_contracts_addresses, block_info)
 
     # def parse_event(self, parsed_receipt, decoded_event):
     #
@@ -1509,72 +1973,6 @@ class EventTokenTransfer(BaseEvent):
             tx_hash))
 
         return d_oper, parsed
-
-
-class EventFastBtcBridgeNewBitcoinTransfer(BaseEvent):
-
-    def parse_event_and_save(self, parsed_receipt, decoded_event):
-
-        parsed = self.parse_event(parsed_receipt, decoded_event)
-
-        # get collection transaction
-        collection_bridge = self.connection_helper.mongo_collection('FastBtcBridge')
-
-        tx_hash = parsed['hash']
-        log_index = parsed['logIndex']
-        id_event = "{0}:{1}".format(tx_hash, log_index)
-
-        d_tx = dict()
-        d_tx["transactionHash"] = tx_hash
-        d_tx["id_event"] = id_event
-        d_tx["transactionHashLastUpdated"] = tx_hash
-        d_tx["blockNumber"] = parsed["blockNumber"]
-        d_tx["type"] = 'PEG_OUT'
-        d_tx["transferId"] = str(parsed["transferId"])
-        d_tx["btcAddress"] = parsed["btcAddress"]
-        d_tx["nonce"] = parsed["nonce"]
-        d_tx["amountSatoshi"] = str(parsed["amountSatoshi"])
-        d_tx["feeSatoshi"] = str(parsed["feeSatoshi"])
-        d_tx["rskAddress"] = sanitize_address(parsed["rskAddress"])
-        d_tx["status"] = 0
-        d_tx["timestamp"] = parsed["timestamp"]
-        d_tx["updated"] = parsed["timestamp"]
-
-        collection_bridge.find_one_and_update(
-            {"transferId": d_tx["transferId"]},
-            {"$set": d_tx},
-            upsert=True)
-
-        log.info("EVENT::NewBitcoinTransfer::{0}".format(d_tx["transferId"]))
-        log.info(d_tx)
-
-        return d_tx, parsed
-
-
-class EventFastBtcBridgeBitcoinTransferStatusUpdated(BaseEvent):
-
-    def parse_event_and_save(self, parsed_receipt, decoded_event):
-
-        parsed = self.parse_event(parsed_receipt, decoded_event)
-
-        # get collection transaction
-        collection_bridge = self.connection_helper.mongo_collection('FastBtcBridge')
-
-        d_tx = dict()
-        d_tx["transactionHashLastUpdated"] = parsed["hash"]
-        d_tx["status"] = parsed["newStatus"]
-        d_tx["transferId"] = str(parsed["transferId"])
-        d_tx["updated"] = parsed["timestamp"]
-
-        collection_bridge.find_one_and_update(
-            {"transferId": d_tx["transferId"]},
-            {"$set": d_tx},
-            upsert=False)
-
-        log.info("EVENT::BitcoinTransferStatusUpdated::{0}".format(d_tx["transferId"]))
-        log.info(d_tx)
-
-        return d_tx, parsed
 
 
 class EventOMOCIncentiveV2ClaimOK(BaseEvent):

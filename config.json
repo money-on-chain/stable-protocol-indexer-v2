@@ -1,10 +1,9 @@
 {
   "uri": "https://public-node.testnet.rsk.co",
-  "collateral": "coinbase",
-  "app_project": "moc",
+  "app_project": "flipmoney",
   "mongo": {
     "uri": "mongodb://localhost:27017/",
-    "db": "moc_v2_alpha_testnet"
+    "db": "flipmoney_mc_testnet"
   },
   "debug": true,
   "tasks": {
@@ -19,15 +18,15 @@
   "scan_raw_transactions": {
     "confirm_blocks": 10,
     "blocks_recession": 1,
-    "from_block": 5799049,
-    "to_block": 5799059,
+    "from_block": 6394157,
+    "to_block": 6394158,
     "max_blocks_to_process": 100
   },
   "scan_raw_transactions_confirming": {
     "confirm_blocks": 20,
     "blocks_recession": 1,
-    "from_block": 5798804,
-    "to_block": 5798805,
+    "from_block": 6394157,
+    "to_block": 6394158,
     "max_blocks_to_process": 100
   },
   "scan_tx_status": {
@@ -36,13 +35,26 @@
   },
   "addresses": {
     "Multicall2": "0xaf7be1ef9537018feda5397d9e3bb9a1e4e27ac8",
-    "Moc": "0xdE6F692a697Fc4B01ea90215619c93092D6D758b",
-    "MocQueue": "0xDD10895E3BB4b830EC27199df041fc524383d56C",
-    "TC": "0x1ad769895a5DeA9605C59f73111A36935bF3da01",
-    "TP": ["0x8665E729aAEbdCC993e43c1d1B117491D8A9F7C7"],
-    "CA": [],
-    "FastBtcBridge": "0x10C848e9495a32acA95F6c23C92eCA2b2bE9903A",
-    "IRegistry": "0xf078375a3dD89dDF4D9dA460352199C6769b5f10",
-    "IncentiveV2": ""
-  }
+    "MocMultiCollateralGuard": "0x29166156f32dD3ac435FeEe0028Aaa4151Bd8908",
+    "IRegistry": "0xbd13268a4a738911c638701DC059B47A3D286716",
+    "IncentiveV2": "0xE4E75DF1D35BB290d642df07dF8b0f3A5400D1e8"
+  },
+  "collateral": [
+    {
+      "name": "BPRO",
+      "type": "rc20"
+    },
+    {
+      "name": "DOC",
+      "type": "rc20"
+    }
+  ],
+  "pegged": [
+    {
+      "name": "ARS"
+    },
+    {
+      "name": "COP"
+    }
+  ]
 }

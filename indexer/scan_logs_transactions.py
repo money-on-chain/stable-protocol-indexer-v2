@@ -14,8 +14,6 @@ from .events import EventMocQueueTCMinted, \
     EventMocQueueTCandTPRedeemed, \
     EventMocQueueTCandTPMinted, \
     EventTokenTransfer, \
-    EventFastBtcBridgeNewBitcoinTransfer, \
-    EventFastBtcBridgeBitcoinTransferStatusUpdated, \
     EventMocQueueOperationError, \
     EventMocQueueUnhandledError, \
     EventMocQueueOperationQueued, \
@@ -74,40 +72,34 @@ class ScanLogsTransactions:
     def init_log_decoder(self):
 
         contracts_log_decoder = dict()
-        contracts_log_decoder[self.contracts_addresses['Moc'].lower()] = LogDecoder(
-            self.contracts_loaded['Moc'].sc
-        )
-
-        contracts_log_decoder[self.contracts_addresses['MocQueue'].lower()] = LogDecoder(
-            self.contracts_loaded['MocQueue'].sc
-        )
-
-        contracts_log_decoder[self.contracts_addresses['TC'].lower()] = LogDecoder(
-            self.contracts_loaded['TC'].sc
-        )
-
-        i = 0
-        for t_pegged in self.options['addresses']['TP']:
-            contracts_log_decoder[t_pegged.lower()] = LogDecoder(
-                self.contracts_loaded['TP'][i].sc
-            )
-            i += 1
-
-        i = 0
-        for c_asset in self.options['addresses']['CA']:
-            contracts_log_decoder[c_asset.lower()] = LogDecoder(
-                self.contracts_loaded['CA'][i].sc
-            )
-            i += 1
-
-        if 'FeeToken' in self.options['addresses']:
-            contracts_log_decoder[self.contracts_addresses['FeeToken'].lower()] = LogDecoder(
-                self.contracts_loaded['FeeToken'].sc
+        for ca_index, ca in enumerate(self.options['collateral']):
+            contracts_log_decoder[self.contracts_addresses['Moc'][ca_index].lower()] = LogDecoder(
+                self.contracts_loaded['Moc'][ca_index].sc
             )
 
-        contracts_log_decoder[self.options['addresses']['FastBtcBridge'].lower()] = LogDecoder(
-            self.contracts_loaded['FastBtcBridge'].sc
+            contracts_log_decoder[self.contracts_addresses['MocQueue'][ca_index].lower()] = LogDecoder(
+                self.contracts_loaded['MocQueue'][ca_index].sc
+            )
+
+            contracts_log_decoder[self.contracts_addresses['TC'][ca_index].lower()] = LogDecoder(
+                self.contracts_loaded['TC'][ca_index].sc
+            )
+
+        for tp_c in self.contracts_loaded["TP"]:
+            contracts_log_decoder[tp_c.address().lower()] = LogDecoder(
+                tp_c.sc
+            )
+
+        for c_asset in self.contracts_loaded['CA']:
+            contracts_log_decoder[c_asset.address().lower()] = LogDecoder(
+                c_asset.sc
+            )
+
+        contracts_log_decoder[self.contracts_addresses['FeeToken'].lower()] = LogDecoder(
+            self.contracts_loaded['FeeToken'].sc
         )
+
+        # OMOC
 
         if 'IncentiveV2' in self.contracts_loaded:
             contracts_log_decoder[self.contracts_addresses['IncentiveV2'].lower()] = LogDecoder(
@@ -149,137 +141,177 @@ class ScanLogsTransactions:
     def map_events(self):
 
         d_event = dict()
-        d_event[self.contracts_addresses["Moc"].lower()] = {
-            "LiqTPRedeemed": EventMocLiqTPRedeemed(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "SuccessFeeDistributed": EventMocSuccessFeeDistributed(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "SettlementExecuted": EventMocSettlementExecuted(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TCInterestPayment": EventMocTCInterestPayment(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TPemaUpdated": EventMocTPemaUpdated(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info)
-        }
 
-        d_event[self.contracts_addresses["MocQueue"].lower()] = {
-            "OperationError": EventMocQueueOperationError(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "UnhandledError": EventMocQueueUnhandledError(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "OperationQueued": EventMocQueueOperationQueued(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "OperationExecuted": EventMocQueueOperationExecuted(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TCMinted": EventMocQueueTCMinted(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TCRedeemed": EventMocQueueTCRedeemed(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TPMinted": EventMocQueueTPMinted(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TPRedeemed": EventMocQueueTPRedeemed(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TPSwappedForTP": EventMocQueueTPSwappedForTP(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TPSwappedForTC": EventMocQueueTPSwappedForTC(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TCSwappedForTP": EventMocQueueTCSwappedForTP(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TCandTPRedeemed": EventMocQueueTCandTPRedeemed(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-            "TCandTPMinted": EventMocQueueTCandTPMinted(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info),
-        }
+        for ca_index, ca in enumerate(self.options['collateral']):
+            d_event[self.contracts_addresses["Moc"][ca_index].lower()] = {
+                "LiqTPRedeemed": EventMocLiqTPRedeemed(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "SuccessFeeDistributed": EventMocSuccessFeeDistributed(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "SettlementExecuted": EventMocSettlementExecuted(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TCInterestPayment": EventMocTCInterestPayment(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TPemaUpdated": EventMocTPemaUpdated(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index)
+            }
 
-        d_event[self.contracts_addresses["TC"].lower()] = {
-            "Transfer": EventTokenTransfer(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info,
-                'TC')
-        }
+            d_event[self.contracts_addresses["MocQueue"][ca_index].lower()] = {
+                "OperationError": EventMocQueueOperationError(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "UnhandledError": EventMocQueueUnhandledError(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "OperationQueued": EventMocQueueOperationQueued(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "OperationExecuted": EventMocQueueOperationExecuted(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TCMinted": EventMocQueueTCMinted(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TCRedeemed": EventMocQueueTCRedeemed(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TPMinted": EventMocQueueTPMinted(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TPRedeemed": EventMocQueueTPRedeemed(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TPSwappedForTP": EventMocQueueTPSwappedForTP(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TPSwappedForTC": EventMocQueueTPSwappedForTC(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TCSwappedForTP": EventMocQueueTCSwappedForTP(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TCandTPRedeemed": EventMocQueueTCandTPRedeemed(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+                "TCandTPMinted": EventMocQueueTCandTPMinted(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    ca_index),
+            }
 
-        i = 0
-        for t_pegged in self.options['addresses']['TP']:
-            d_event[t_pegged.lower()] = {
+            d_event[self.contracts_addresses["TC"][ca_index].lower()] = {
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
                     self.contracts_loaded,
+                    self.contracts_addresses,
+                    self.filter_contracts_addresses,
+                    self.block_info,
+                    'TC_{0}'.format(ca_index))
+            }
+
+        i = 0
+        for tp_addr in self.contracts_addresses['TP']:
+            d_event[tp_addr.lower()] = {
+                "Transfer": EventTokenTransfer(
+                    self.options,
+                    self.connection_helper,
+                    self.contracts_loaded,
+                    self.contracts_addresses,
                     self.filter_contracts_addresses,
                     self.block_info,
                     'TP_{0}'.format(i))
@@ -287,42 +319,28 @@ class ScanLogsTransactions:
             i += 1
 
         i = 0
-        for c_asset in self.options['addresses']['CA']:
-            d_event[c_asset.lower()] = {
+        for ca_addr in self.contracts_addresses['CA']:
+            d_event[ca_addr.lower()] = {
                 "Transfer": EventTokenTransfer(
                     self.options,
                     self.connection_helper,
                     self.contracts_loaded,
+                    self.contracts_addresses,
                     self.filter_contracts_addresses,
                     self.block_info,
                     'CA_{0}'.format(i))
             }
             i += 1
 
-        if 'FeeToken' in self.options['addresses']:
-            d_event[self.contracts_addresses["FeeToken"].lower()] = {
-                "Transfer": EventTokenTransfer(
-                    self.options,
-                    self.connection_helper,
-                    self.contracts_loaded,
-                    self.filter_contracts_addresses,
-                    self.block_info,
-                    'FeeToken')
-            }
-
-        d_event[self.options['addresses']['FastBtcBridge'].lower()] = {
-            "NewBitcoinTransfer": EventFastBtcBridgeNewBitcoinTransfer(
+        d_event[self.contracts_addresses["FeeToken"].lower()] = {
+            "Transfer": EventTokenTransfer(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
-                self.block_info),
-            "BitcoinTransferStatusUpdated": EventFastBtcBridgeBitcoinTransferStatusUpdated(
-                self.options,
-                self.connection_helper,
-                self.contracts_loaded,
-                self.filter_contracts_addresses,
-                self.block_info)
+                self.block_info,
+                'FeeToken')
         }
 
         if 'IncentiveV2' in self.contracts_loaded:
@@ -331,6 +349,7 @@ class ScanLogsTransactions:
                     self.options,
                     self.connection_helper,
                     self.contracts_loaded,
+                    self.contracts_addresses,
                     self.filter_contracts_addresses,
                     self.block_info)
             }
@@ -340,6 +359,7 @@ class ScanLogsTransactions:
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info)
         }
@@ -349,18 +369,21 @@ class ScanLogsTransactions:
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info),
             "PaymentDeposit": EventOMOCDelayMachinePaymentDeposit(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info),
             "PaymentWithdraw": EventOMOCDelayMachinePaymentWithdraw(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info)
         }
@@ -370,30 +393,35 @@ class ScanLogsTransactions:
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info),
             "CancelEarnings": EventOMOCSupportersCancelEarnings(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info),
             "PayEarnings": EventOMOCSupportersPayEarnings(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info),
             "Withdraw": EventOMOCSupportersWithdraw(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info),
             "WithdrawStake": EventOMOCSupportersWithdrawStake(
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info)
         }
@@ -403,6 +431,7 @@ class ScanLogsTransactions:
                 self.options,
                 self.connection_helper,
                 self.contracts_loaded,
+                self.contracts_addresses,
                 self.filter_contracts_addresses,
                 self.block_info)
         }
