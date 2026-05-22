@@ -1,6 +1,6 @@
 # Stable Protocol Indexer v2
 
-## Warning: This is only for version 2 of the main contracts. 
+## Note: DEPRECATED!!! This repo is going to be deprecated use V3
 
 ## Introduction
 
